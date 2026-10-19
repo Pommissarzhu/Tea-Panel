@@ -9,9 +9,16 @@ enum TeaMotion {
     static let feedback = Animation.easeOut(duration: 0.12)
     static let selection = Animation.easeInOut(duration: 0.18)
     static let content = Animation.timingCurve(0.22, 0.8, 0.25, 1, duration: 0.24)
+    static let readout = Animation.easeInOut(duration: 0.26)
 
     static func transition(reduceMotion: Bool) -> AnyTransition {
         reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 6))
+    }
+
+    static func readoutTransition(reduceMotion: Bool) -> AnyTransition {
+        guard !reduceMotion else { return .opacity }
+        return .asymmetric(insertion: .opacity.combined(with: .offset(y: 6)),
+                           removal: .opacity.combined(with: .offset(y: -6)))
     }
 
     static func animation(_ animation: Animation, reduceMotion: Bool) -> Animation {

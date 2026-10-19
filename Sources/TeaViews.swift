@@ -24,6 +24,37 @@ enum TeaStyle {
     }
 }
 
+enum TeaTypography {
+    static func font(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        .system(size: size, weight: weight, design: .rounded)
+    }
+
+    static let heroValue = font(size: 58, weight: .light).monospacedDigit()
+}
+
+struct TeaHeroEyebrow: View {
+    let title: String
+    let symbol: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ZStack(alignment: .trailing) {
+                Image(systemName: symbol)
+                    .resizable().scaledToFit()
+                    .frame(width: 14, height: 14, alignment: .trailing)
+                    .id(symbol).transition(.opacity)
+            }
+            .frame(width: 16, height: 16, alignment: .trailing)
+            .accessibilityHidden(true)
+            Text(title)
+                .modifier(TeaValueChange(value: title))
+                .lineLimit(1)
+        }
+        .font(TeaTypography.font(size: 11, weight: .medium))
+        .foregroundStyle(TeaStyle.muted)
+    }
+}
+
 private struct TeaNumberField: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var isFocused: Bool
@@ -33,17 +64,17 @@ private struct TeaNumberField: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(label).font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+            Text(label).font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
             HStack(spacing: 4) {
                 TextField(label, value: $value, format: .number.precision(.fractionLength(0...1)))
-                    .textFieldStyle(.plain).font(.system(size: 19, weight: .medium, design: .rounded))
+                    .textFieldStyle(.plain).font(TeaTypography.font(size: 19, weight: .medium))
                     .monospacedDigit()
                     .accessibilityLabel(label)
                     .focused($isFocused)
                     .onSubmit {
                         if let window = NSApp.keyWindow { window.makeFirstResponder(window.contentView) }
                     }
-                Text(suffix).font(.system(size: 12)).foregroundStyle(TeaStyle.muted)
+                Text(suffix).font(TeaTypography.font(size: 12)).foregroundStyle(TeaStyle.muted)
             }
             .frame(height: 26)
         }
@@ -76,7 +107,7 @@ struct TeaMenuView: View {
                     teaPicker
                     modePicker
                     if let message = store.configurationMessage {
-                        Text(message).font(.system(size: 11)).foregroundStyle(TeaStyle.green)
+                        Text(message).font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.green)
                             .id(configurationFeedbackID)
                             .transition(TeaMotion.transition(reduceMotion: reduceMotion))
                     }
@@ -115,7 +146,7 @@ struct TeaMenuView: View {
             RoundedRectangle(cornerRadius: 22).strokeBorder(TeaStyle.border, lineWidth: 1)
         }
         .foregroundStyle(TeaStyle.forest)
-        .font(.system(size: 13))
+        .font(TeaTypography.font(size: 13))
         .environment(\.colorScheme, .light)
         .tint(TeaStyle.green)
     }
@@ -123,19 +154,19 @@ struct TeaMenuView: View {
     private var header: some View {
         HStack(spacing: 11) {
             Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 21, weight: .medium))
+                .font(TeaTypography.font(size: 21, weight: .medium))
                 .frame(width: 43, height: 43)
                 .background(TeaStyle.pale, in: RoundedRectangle(cornerRadius: 14))
             VStack(alignment: .leading, spacing: 3) {
-                Text("等一盏茶").font(.system(size: 21, weight: .semibold, design: .rounded))
-                Text("TEA PANEL").font(.system(size: 9, weight: .semibold)).tracking(2.5).foregroundStyle(TeaStyle.muted)
+                Text("等一盏茶").font(TeaTypography.font(size: 21, weight: .semibold))
+                Text("TEA PANEL").font(TeaTypography.font(size: 9, weight: .semibold)).tracking(2.5).foregroundStyle(TeaStyle.muted)
             }
             Spacer()
             Button {
                 act { store.showsSettings.toggle() }
             } label: {
                 Image(systemName: "slider.horizontal.3")
-                    .font(.system(size: 16)).frame(width: 32, height: 32)
+                    .font(TeaTypography.font(size: 16)).frame(width: 32, height: 32)
                     .background(store.showsSettings ? TeaStyle.pale : Color.clear, in: Circle())
             }
             .buttonStyle(TeaButtonStyle())
@@ -151,8 +182,8 @@ struct TeaMenuView: View {
                 let selected = !store.isCustomMode && store.tea == tea
                 Button { act { store.selectTea(tea) } } label: {
                     VStack(spacing: 7) {
-                        Image(systemName: tea.symbol).font(.system(size: 18, weight: .medium))
-                        Text(tea.name).font(.system(size: 12, weight: selected ? .semibold : .regular))
+                        Image(systemName: tea.symbol).font(TeaTypography.font(size: 18, weight: .medium))
+                        Text(tea.name).font(TeaTypography.font(size: 12, weight: selected ? .semibold : .regular))
                     }
                     .frame(maxWidth: .infinity).padding(.vertical, 12)
                     .background(selected ? TeaStyle.forest : Color.white.opacity(0.6), in: RoundedRectangle(cornerRadius: 15))
@@ -177,7 +208,7 @@ struct TeaMenuView: View {
             } label: {
                 Label(store.isCustomMode && store.hasUnsavedChanges ? "自定义 · 未保存" : "自定义",
                       systemImage: store.isCustomMode ? store.configuration.icon.rawValue : "slider.horizontal.3")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(TeaTypography.font(size: 11, weight: .medium))
                     .padding(.horizontal, 10).padding(.vertical, 8)
                     .background(store.isCustomMode ? TeaStyle.forest : Color.white.opacity(0.7), in: Capsule())
                     .foregroundStyle(store.isCustomMode ? TeaStyle.background : TeaStyle.green)
@@ -186,7 +217,7 @@ struct TeaMenuView: View {
             }.buttonStyle(TeaButtonStyle()).disabled(store.isActive && !store.isCustomMode)
             if store.isCustomMode {
                 Button(store.savedConfiguration == nil ? "保存" : "更新") { saveConfiguration() }
-                    .buttonStyle(TeaButtonStyle()).font(.system(size: 11, weight: .semibold))
+                    .buttonStyle(TeaButtonStyle()).font(TeaTypography.font(size: 11, weight: .semibold))
                     .disabled(store.savedConfiguration == nil && !store.canSaveAsNew)
                     .transition(.opacity)
             }
@@ -206,7 +237,7 @@ struct TeaMenuView: View {
                     }
                 }
             } label: {
-                Text("已存 \(store.customConfigurations.count)/10").font(.system(size: 11))
+                Text("已存 \(store.customConfigurations.count)/10").font(TeaTypography.font(size: 11))
                     .modifier(TeaValueChange(value: String(store.customConfigurations.count), numeric: true))
             }
             .menuStyle(.borderlessButton).fixedSize().disabled(store.isActive)
@@ -218,48 +249,24 @@ struct TeaMenuView: View {
     private var hero: some View {
         VStack(alignment: .leading, spacing: 13) {
             HStack {
-                Label(heroEyebrow, systemImage: heroSymbol)
-                    .font(.system(size: 11, weight: .medium)).foregroundStyle(TeaStyle.muted).lineLimit(1)
-                    .id(heroEyebrow).transition(.opacity)
+                TeaHeroEyebrow(title: heroEyebrow, symbol: heroSymbol)
                 Spacer()
                 Text("第 \(store.displayedInfusion) 泡")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(TeaTypography.font(size: 11, weight: .semibold))
                     .modifier(TeaValueChange(value: String(store.displayedInfusion), numeric: true))
                     .padding(.horizontal, 9).padding(.vertical, 5)
                     .background(TeaStyle.pale, in: Capsule())
             }
-            HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 6) {
-                    if store.phase == .idle && store.displayedInfusion > 1 {
-                        Text(teaDuration(store.currentBrewSeconds))
-                            .font(.system(size: 34, weight: .light, design: .rounded)).monospacedDigit()
-                            .modifier(TeaValueChange(value: String(store.currentBrewSeconds), numeric: true))
-                            .frame(height: 69, alignment: .leading)
-                        Text("本泡浸泡 · 沿用原茶叶，不再加干茶")
-                            .font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
-                    } else if store.phase == .idle {
-                        HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            Text(teaGrams(store.recommendedGrams))
-                                .font(.system(size: 58, weight: .light, design: .rounded)).monospacedDigit()
-                                .modifier(TeaValueChange(value: teaGrams(store.recommendedGrams), numeric: true))
-                            Text("克").font(.system(size: 17, weight: .medium)).foregroundStyle(TeaStyle.muted)
-                        }
-                        Text("\(store.isCustomMode ? "自定义" : "建议干茶") · \(store.tea.detail)").font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
-                            .modifier(TeaValueChange(value: store.tea.rawValue + store.isCustomMode.description))
-                    } else if store.phase == .cooling || store.phase == .brewing {
-                        Text(teaClock(store.remainingSeconds))
-                            .font(.system(size: 57, weight: .light, design: .rounded)).monospacedDigit()
-                            .transaction { $0.animation = nil }
-                        Text(store.phase == .cooling ? "先等水凉一点，再放茶叶" : "让茶香慢慢释放")
-                            .font(.system(size: 12)).foregroundStyle(TeaStyle.muted)
-                    } else {
-                        Text(heroTitle).font(.system(size: 31, weight: .medium, design: .rounded))
-                        Text(heroSubtitle).font(.system(size: 12)).foregroundStyle(TeaStyle.muted)
-                    }
+            HStack(alignment: .center, spacing: 12) {
+                ZStack(alignment: .leading) {
+                    heroReadout
+                        .id(heroReadoutKind)
+                        .transition(TeaMotion.readoutTransition(reduceMotion: reduceMotion))
                 }
-                .id(store.phase)
-                .transition(TeaMotion.transition(reduceMotion: reduceMotion))
-                Spacer(minLength: 0)
+                // The fixed-width menu reserves 223 pt for values and 65 pt for the ring.
+                .frame(width: 223, height: 89, alignment: .leading)
+                .clipped()
+                .animation(TeaMotion.animation(TeaMotion.readout, reduceMotion: reduceMotion), value: heroReadoutKind)
                 ZStack {
                     Circle().stroke(TeaStyle.pale, lineWidth: 3)
                     if store.phase == .cooling || store.phase == .brewing {
@@ -270,7 +277,7 @@ struct TeaMenuView: View {
                             .id(store.phase).transition(.opacity)
                     }
                     Image(systemName: heroSymbol)
-                        .font(.system(size: 28, weight: .light)).foregroundStyle(TeaStyle.green)
+                        .font(TeaTypography.font(size: 28, weight: .light)).foregroundStyle(TeaStyle.green)
                         .id(heroSymbol).transition(.opacity)
                 }
                 .frame(width: 65, height: 65)
@@ -280,9 +287,9 @@ struct TeaMenuView: View {
             if store.isActive {
                 HStack(spacing: 5) {
                     stagePill("晾水", active: store.phase == .cooling)
-                    Image(systemName: "chevron.right").font(.system(size: 8))
+                    Image(systemName: "chevron.right").font(TeaTypography.font(size: 8))
                     stagePill("投茶", active: store.phase == .waitingForLeaves)
-                    Image(systemName: "chevron.right").font(.system(size: 8))
+                    Image(systemName: "chevron.right").font(TeaTypography.font(size: 8))
                     stagePill("泡茶", active: store.phase == .brewing || store.phase == .ready)
                 }
                 .foregroundStyle(TeaStyle.muted)
@@ -297,8 +304,69 @@ struct TeaMenuView: View {
         .animation(TeaMotion.animation(TeaMotion.selection, reduceMotion: reduceMotion), value: heroSymbol)
     }
 
+    private enum HeroReadoutKind: Hashable {
+        case dose, duration, cooling, brewing, waitingForLeaves, ready, preparingRefill
+    }
+
+    private var heroReadoutKind: HeroReadoutKind {
+        switch store.phase {
+        case .idle: return store.displayedInfusion > 1 ? .duration : .dose
+        case .cooling: return .cooling
+        case .brewing: return .brewing
+        case .waitingForLeaves: return .waitingForLeaves
+        case .ready: return .ready
+        case .preparingRefill: return .preparingRefill
+        }
+    }
+
+    private var heroReadout: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Group {
+                switch heroReadoutKind {
+                case .dose:
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(teaGrams(store.recommendedGrams))
+                            .font(TeaTypography.heroValue)
+                            .lineLimit(1).minimumScaleFactor(0.5)
+                            .modifier(TeaValueChange(value: teaGrams(store.recommendedGrams), numeric: true))
+                        Text("克").font(TeaTypography.font(size: 17, weight: .medium)).foregroundStyle(TeaStyle.muted)
+                    }
+                case .duration:
+                    Text(teaClock(store.currentBrewSeconds))
+                        .font(TeaTypography.heroValue)
+                        .lineLimit(1).minimumScaleFactor(0.5)
+                        .modifier(TeaValueChange(value: String(store.currentBrewSeconds), numeric: true))
+                        .accessibilityLabel("本泡浸泡 \(teaDuration(store.currentBrewSeconds))")
+                case .cooling, .brewing:
+                    Text(teaClock(store.remainingSeconds))
+                        .font(TeaTypography.heroValue)
+                        .lineLimit(1).minimumScaleFactor(0.75)
+                        .transaction { $0.animation = nil }
+                default:
+                    Text(heroTitle).font(TeaTypography.font(size: 31, weight: .medium))
+                }
+            }
+            .frame(height: 69, alignment: .leading)
+            Text(heroReadoutSubtitle)
+                .font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.muted)
+                .lineLimit(1).minimumScaleFactor(0.9)
+                .frame(height: 14, alignment: .topLeading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var heroReadoutSubtitle: String {
+        switch heroReadoutKind {
+        case .dose: return "\(store.isCustomMode ? "自定义" : "建议干茶") · \(store.tea.detail)"
+        case .duration: return "本泡浸泡 · 沿用原茶叶，不再加干茶"
+        case .cooling: return "先等水凉一点，再放茶叶"
+        case .brewing: return "让茶香慢慢释放"
+        default: return heroSubtitle
+        }
+    }
+
     private func stagePill(_ label: String, active: Bool) -> some View {
-        Text(label).font(.system(size: 10, weight: active ? .semibold : .regular))
+        Text(label).font(TeaTypography.font(size: 10, weight: active ? .semibold : .regular))
             .padding(.horizontal, 12).padding(.vertical, 5)
             .background(active ? TeaStyle.pale : Color.clear, in: Capsule())
             .foregroundStyle(active ? TeaStyle.forest : TeaStyle.muted)
@@ -310,16 +378,16 @@ struct TeaMenuView: View {
             numberField("本次注水", suffix: "mL", value: Binding(
                 get: { store.preferences.waterML }, set: { store.setWaterML($0) }))
             VStack(alignment: .leading, spacing: 7) {
-                Text("当前泡次").font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+                Text("当前泡次").font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
                 HStack(spacing: 8) {
                     infusionButton("minus", label: "减少泡次", enabled: store.startingInfusion > 1) {
                         store.setStartingInfusion(store.startingInfusion - 1)
                     }
                     HStack(alignment: .firstTextBaseline, spacing: 3) {
                         Text("\(store.startingInfusion)")
-                            .font(.system(size: 19, weight: .medium, design: .rounded)).monospacedDigit()
+                            .font(TeaTypography.font(size: 19, weight: .medium)).monospacedDigit()
                             .modifier(TeaValueChange(value: String(store.startingInfusion), numeric: true))
-                        Text("泡").font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
+                        Text("泡").font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.muted)
                     }
                     .frame(maxWidth: .infinity)
                     .accessibilityElement(children: .ignore)
@@ -337,7 +405,7 @@ struct TeaMenuView: View {
 
     private func infusionButton(_ symbol: String, label: String, enabled: Bool, action: @escaping () -> Void) -> some View {
         Button { act(action) } label: {
-            Image(systemName: symbol).font(.system(size: 10, weight: .semibold))
+            Image(systemName: symbol).font(TeaTypography.font(size: 10, weight: .semibold))
                 .frame(width: 26, height: 26)
                 .foregroundStyle(symbol == "plus" ? TeaStyle.background : TeaStyle.forest)
                 .background(symbol == "plus" ? TeaStyle.forest : TeaStyle.pale, in: Circle())
@@ -368,13 +436,13 @@ struct TeaMenuView: View {
                     Text(store.displayedInfusion > 1 ? "沿用原茶叶" : "干茶 \(teaGrams(round.grams)) 克")
                     Spacer()
                     Text("\(teaNumber(round.waterPerGram)) : 1")
-                }.font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
+                }.font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.muted)
                 if store.displayedInfusion >= 4 {
                     Text("茶味可能已经淡了，可以换新茶叶。")
-                        .font(.system(size: 11)).foregroundStyle(TeaStyle.green)
+                        .font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.green)
                 } else if round.startedInfusions > 0 && store.phase == .preparingRefill {
                     Text("沿用原茶叶，不用再加干茶。")
-                        .font(.system(size: 11)).foregroundStyle(TeaStyle.green)
+                        .font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.green)
                 }
             }
         }.padding(.horizontal, 3)
@@ -392,8 +460,8 @@ struct TeaMenuView: View {
 
     private func recipeCell(_ label: String, value: String) -> some View {
         VStack(spacing: 6) {
-            Text(label).font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
-            Text(value).font(.system(size: 12, weight: .medium))
+            Text(label).font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
+            Text(value).font(TeaTypography.font(size: 12, weight: .medium))
                 .modifier(TeaValueChange(value: value, numeric: true))
         }.frame(maxWidth: .infinity)
     }
@@ -401,7 +469,7 @@ struct TeaMenuView: View {
     private var actions: some View {
         VStack(spacing: 10) {
             if !store.isActive, let error = store.validationMessage {
-                Text(error).font(.system(size: 11)).foregroundStyle(.red)
+                Text(error).font(TeaTypography.font(size: 11)).foregroundStyle(.red)
                     .transition(TeaMotion.transition(reduceMotion: reduceMotion))
             }
             Button { act(onPrimary) } label: {
@@ -409,10 +477,10 @@ struct TeaMenuView: View {
                     Text(primaryTitle)
                         .id(primaryTitle).transition(.opacity)
                     if store.phase != .cooling && store.phase != .brewing {
-                        Image(systemName: "arrow.right").font(.system(size: 11, weight: .semibold))
+                        Image(systemName: "arrow.right").font(TeaTypography.font(size: 11, weight: .semibold))
                     }
                 }
-                .font(.system(size: 14, weight: .semibold))
+                .font(TeaTypography.font(size: 14, weight: .semibold))
                 .frame(maxWidth: .infinity).frame(height: 45)
                 .foregroundStyle(TeaStyle.background)
                 .background(TeaStyle.forest, in: RoundedRectangle(cornerRadius: 13))
@@ -426,18 +494,18 @@ struct TeaMenuView: View {
                     Button("换新茶叶") { act(onEnd) }
                     Spacer()
                     Button("结束本轮") { act(onEnd) }
-                }.buttonStyle(TeaButtonStyle()).font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
+                }.buttonStyle(TeaButtonStyle()).font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.muted)
             } else if store.canSkipCooling {
                 HStack {
                     skipCoolingButton
                     Spacer(minLength: 8)
                     Text(store.temperatureText)
-                        .font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+                        .font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
                         .help("晾水计时不等于测温")
                 }
             } else {
                 Text("\(store.temperatureText) · 晾水计时不等于测温")
-                    .font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+                    .font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
             }
         }
         .animation(TeaMotion.animation(TeaMotion.content, reduceMotion: reduceMotion), value: store.validationMessage)
@@ -446,7 +514,7 @@ struct TeaMenuView: View {
     private var skipCoolingButton: some View {
         Button { act(onSkipCooling) } label: {
             Label("跳过晾水，直接泡茶", systemImage: "forward.end.fill")
-                .font(.system(size: 11, weight: .medium))
+                .font(TeaTypography.font(size: 11, weight: .medium))
         }
         .buttonStyle(TeaButtonStyle()).foregroundStyle(TeaStyle.green)
         .disabled(!store.isActive && store.validationMessage != nil)
@@ -457,14 +525,14 @@ struct TeaMenuView: View {
     private var settings: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text(store.isCustomMode ? "自定义配置" : "内置模板参数").font(.system(size: 14, weight: .semibold))
+                Text(store.isCustomMode ? "自定义配置" : "内置模板参数").font(TeaTypography.font(size: 14, weight: .semibold))
                 Spacer()
-                Text(store.tea.name).font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
+                Text(store.tea.name).font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.muted)
             }
             TextField("配置名称", text: Binding(get: { store.configuration.name }, set: { name in
                 change { store.setConfigurationName(name) }
             }))
-                .textFieldStyle(.roundedBorder).font(.system(size: 13)).accessibilityLabel("自定义配置名称")
+                .textFieldStyle(.roundedBorder).font(TeaTypography.font(size: 13)).accessibilityLabel("自定义配置名称")
             iconPicker
             numberField("水 : 干茶（重量比）", suffix: ": 1", value: ratioBinding)
             temperatureSetting
@@ -472,14 +540,14 @@ struct TeaMenuView: View {
             timeSetting("首泡时间", keyPath: \.firstBrewSeconds, range: 15...1800, step: 15)
             timeSetting("每次续泡增加", keyPath: \.incrementSeconds, range: 0...600, step: 15, zeroText: "不额外加时")
             Text(store.isActive ? "本轮用量和名称保持不变；时间修改用于下一泡，其余修改用于下一轮。" : "修改任意参数即进入自定义模式。草稿自动保留，点击保存后加入配置列表。")
-                .font(.system(size: 10)).foregroundStyle(TeaStyle.muted).fixedSize(horizontal: false, vertical: true)
+                .font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted).fixedSize(horizontal: false, vertical: true)
             if store.isCustomMode {
                 configurationControls.transition(TeaMotion.transition(reduceMotion: reduceMotion))
             }
             Button {
                 act { store.showsSettings = false }
             } label: {
-                Text("返回泡茶").font(.system(size: 12, weight: .semibold))
+                Text("返回泡茶").font(TeaTypography.font(size: 12, weight: .semibold))
                     .frame(maxWidth: .infinity).padding(.vertical, 11)
                     .background(TeaStyle.pale, in: RoundedRectangle(cornerRadius: 10))
             }.buttonStyle(TeaButtonStyle())
@@ -489,7 +557,7 @@ struct TeaMenuView: View {
 
     private var cupSettings: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("我的杯子").font(.system(size: 14, weight: .semibold))
+            Text("我的杯子").font(TeaTypography.font(size: 14, weight: .semibold))
             HStack(spacing: 11) {
                 numberField("杯子容积", suffix: "mL", value: Binding(
                     get: { store.preferences.cupCapacityML }, set: { store.setCapacity($0) }))
@@ -497,19 +565,19 @@ struct TeaMenuView: View {
                     get: { store.preferences.waterML }, set: { store.setWaterML($0) }))
             }
             Text("所有茶共用，切换配置时保留；修改不进入自定义模式。")
-                .font(.system(size: 10)).foregroundStyle(TeaStyle.muted).fixedSize(horizontal: false, vertical: true)
+                .font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted).fixedSize(horizontal: false, vertical: true)
         }
         .padding(15).background(TeaStyle.pale.opacity(0.5), in: RoundedRectangle(cornerRadius: 15))
     }
 
     private var iconPicker: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("配置图标").font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+            Text("配置图标").font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 5), spacing: 6) {
                 ForEach(TeaIcon.allCases) { icon in
                     let selected = store.configuration.icon == icon
                     Button { act { store.setConfigurationIcon(icon) } } label: {
-                        Image(systemName: icon.rawValue).font(.system(size: 17))
+                        Image(systemName: icon.rawValue).font(TeaTypography.font(size: 17))
                             .frame(maxWidth: .infinity).frame(height: 34)
                             .background(selected ? TeaStyle.forest : TeaStyle.pale.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
                             .foregroundStyle(selected ? TeaStyle.background : TeaStyle.green)
@@ -525,7 +593,7 @@ struct TeaMenuView: View {
         VStack(alignment: .leading, spacing: 10) {
             if !store.canSaveAsNew {
                 Text("已保存 10 条，可更新或删除已有配置。")
-                    .font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+                    .font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
             }
             HStack {
                 Button(store.savedConfiguration == nil ? "保存配置" : "更新配置") { saveConfiguration() }
@@ -541,17 +609,17 @@ struct TeaMenuView: View {
                     }
                         .foregroundStyle(.red).disabled(store.isActive)
                 }
-            }.buttonStyle(TeaButtonStyle()).font(.system(size: 11, weight: .medium))
+            }.buttonStyle(TeaButtonStyle()).font(TeaTypography.font(size: 11, weight: .medium))
         }
     }
 
     private var temperatureSetting: some View {
         VStack(spacing: 9) {
             HStack {
-                Text("参考水温").font(.system(size: 12))
+                Text("参考水温").font(TeaTypography.font(size: 12))
                 Spacer()
                 Text("\(store.configuration.waterTemperatureC)°C")
-                    .font(.system(size: 16, weight: .medium, design: .rounded)).monospacedDigit()
+                    .font(TeaTypography.font(size: 16, weight: .medium)).monospacedDigit()
                     .modifier(TeaValueChange(value: String(store.configuration.waterTemperatureC), numeric: true))
             }
             Slider(value: Binding(get: { Double(store.configuration.waterTemperatureC) },
@@ -562,7 +630,7 @@ struct TeaMenuView: View {
                     let selected = store.configuration.waterTemperatureC == temperature
                     Button { act { store.setTemperature(temperature) } } label: {
                         Text("\(temperature)°")
-                            .font(.system(size: 10, weight: .medium)).monospacedDigit()
+                            .font(TeaTypography.font(size: 10, weight: .medium)).monospacedDigit()
                             .frame(maxWidth: .infinity).padding(.vertical, 5)
                             .foregroundStyle(selected ? TeaStyle.background : TeaStyle.green)
                             .background(selected ? TeaStyle.forest : TeaStyle.pale.opacity(0.6), in: Capsule())
@@ -594,9 +662,9 @@ struct TeaMenuView: View {
             .filter { range.contains(minutes.wrappedValue * 60 + $0) }.sorted()
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(title).font(.system(size: 12))
+                Text(title).font(TeaTypography.font(size: 12))
                 if value.wrappedValue == 0, let zeroText {
-                    Text(zeroText).font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+                    Text(zeroText).font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
                 }
             }
             Spacer(minLength: 4)
@@ -617,7 +685,7 @@ struct TeaMenuView: View {
                 .modifier(TeaValueChange(value: String(selection.wrappedValue), numeric: true))
         }
         .menuStyle(.borderlessButton).menuIndicator(.visible)
-        .font(.system(size: 13, weight: .medium, design: .rounded)).monospacedDigit()
+        .font(TeaTypography.font(size: 13, weight: .medium)).monospacedDigit()
         .frame(width: 72, height: 34)
         .background(Color.white.opacity(0.9), in: RoundedRectangle(cornerRadius: 9))
         .overlay {
@@ -633,7 +701,7 @@ struct TeaMenuView: View {
     private var footer: some View {
         HStack {
             Label("静音也看得见", systemImage: "speaker.slash")
-                .font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
+                .font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.muted)
             Spacer()
             Button("预览提醒") { act(onPreview) }
                 .disabled(store.reminder != nil)
@@ -641,7 +709,7 @@ struct TeaMenuView: View {
             Text("·").foregroundStyle(TeaStyle.border)
             Button("退出") { act(onQuit) }
         }
-        .buttonStyle(TeaButtonStyle()).font(.system(size: 11)).foregroundStyle(TeaStyle.green)
+        .buttonStyle(TeaButtonStyle()).font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.green)
         .padding(.horizontal, 22).padding(.vertical, 15)
         .background(TeaStyle.background)
         .overlay(alignment: .top) { Rectangle().fill(TeaStyle.border.opacity(0.6)).frame(height: 0.5) }
@@ -730,27 +798,27 @@ struct TeaReminderView: View {
         VStack(spacing: 15) {
             HStack {
                 Text(reminder.isPreview ? "提醒预览" : "TEA PANEL")
-                    .font(.system(size: 10, weight: .medium)).tracking(2)
+                    .font(TeaTypography.font(size: 10, weight: .medium)).tracking(2)
                 Spacer()
                 Text("\(reminder.name) · 第 \(reminder.infusion) 泡")
-                    .font(.system(size: 11, weight: .medium)).lineLimit(1)
+                    .font(TeaTypography.font(size: 11, weight: .medium)).lineLimit(1)
             }.foregroundStyle(TeaStyle.pale.opacity(0.8))
 
             Image(systemName: reminder.symbol)
-                .font(.system(size: 31, weight: .light)).foregroundStyle(TeaStyle.pale)
+                .font(TeaTypography.font(size: 31, weight: .light)).foregroundStyle(TeaStyle.pale)
                 .padding(.top, 4)
                 .scaleEffect(hasAppeared || reduceMotion ? 1 : 0.88)
                 .offset(y: hasAppeared || reduceMotion ? 0 : 3)
                 .opacity(hasAppeared ? 1 : 0)
                 .animation(reduceMotion ? .easeOut(duration: 0.1) : .easeOut(duration: 0.4).delay(0.04), value: hasAppeared)
             Text(reminder.kind == .addLeaves ? "晾水计时结束" : "你的茶，泡好了")
-                .font(.system(size: 28, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                .font(TeaTypography.font(size: 28, weight: .medium)).foregroundStyle(.white)
             Text(subtitle)
-                .font(.system(size: 13)).foregroundStyle(TeaStyle.pale.opacity(0.85))
+                .font(TeaTypography.font(size: 13)).foregroundStyle(TeaStyle.pale.opacity(0.85))
                 .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
 
             Button(action: onConfirm) {
-                Text(buttonTitle).font(.system(size: 14, weight: .semibold))
+                Text(buttonTitle).font(TeaTypography.font(size: 14, weight: .semibold))
                     .frame(maxWidth: .infinity).frame(height: 43)
                     .foregroundStyle(TeaStyle.forest)
                     .background(TeaStyle.pale, in: RoundedRectangle(cornerRadius: 12))
@@ -758,10 +826,10 @@ struct TeaReminderView: View {
 
             if reminder.kind == .addLeaves && !reminder.isPreview {
                 Button("结束本轮", action: onEnd)
-                    .buttonStyle(TeaButtonStyle()).font(.system(size: 11)).foregroundStyle(TeaStyle.pale.opacity(0.7))
+                    .buttonStyle(TeaButtonStyle()).font(TeaTypography.font(size: 11)).foregroundStyle(TeaStyle.pale.opacity(0.7))
             } else {
                 Text(reminder.isPreview ? "实际到点后也会这样提醒，直到你点击处理" : "静音提醒 · 等你处理后再收起")
-                    .font(.system(size: 10)).foregroundStyle(TeaStyle.pale.opacity(0.6))
+                    .font(TeaTypography.font(size: 10)).foregroundStyle(TeaStyle.pale.opacity(0.6))
             }
         }
         .padding(25).frame(width: 440)
