@@ -22,7 +22,7 @@ ditto "$APP_PATH" "$PACKAGE_STAGE/Tea Panel.app"
 ln -s /Applications "$PACKAGE_STAGE/Applications"
 cp LICENSE "$PACKAGE_STAGE/LICENSE.txt"
 
-hdiutil create -volname "Tea Panel" -srcfolder "$PACKAGE_STAGE" \
+hdiutil create -volname "茶伴" -srcfolder "$PACKAGE_STAGE" \
   -fs HFS+ -format UDZO -ov "$DMG_PATH"
 hdiutil verify "$DMG_PATH"
 (

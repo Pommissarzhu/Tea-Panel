@@ -68,7 +68,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
             button.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
             button.target = self
             button.action = #selector(toggleMenu)
-            button.setAccessibilityLabel("Tea Panel 泡茶提醒")
+            button.setAccessibilityLabel("茶伴泡茶提醒")
         }
 
         menuPanel.isFloatingPanel = true
@@ -81,7 +81,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
         menuPanel.isOpaque = false
         menuPanel.hasShadow = true
         menuPanel.onCancel = { [weak self] in self?.hideMenu() }
-        menuPanel.setAccessibilityLabel("Tea Panel 泡茶面板")
+        menuPanel.setAccessibilityLabel("茶伴泡茶面板")
         let host = TeaMenuHostingView(rootView: TeaMenuView(
             store: store,
             onPrimary: { [weak self] in self?.performPrimary() },
@@ -202,7 +202,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
         }
         let toolTip = store.isActive
             ? "\(store.displayName) · 第 \(store.displayedInfusion) 泡 · \(store.statusText)"
-            : "Tea Panel · \(store.displayName)"
+            : "茶伴 · \(store.displayName)"
         if button.toolTip != toolTip { button.toolTip = toolTip }
     }
 
@@ -239,7 +239,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
         panel.isOpaque = false
         panel.hasShadow = true
         panel.isMovableByWindowBackground = true
-        panel.setAccessibilityLabel("Tea Panel 泡茶到点提醒")
+        panel.setAccessibilityLabel("茶伴泡茶到点提醒")
 
         let host = NSHostingView(rootView: TeaReminderView(
             reminder: reminder,

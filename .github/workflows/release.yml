@@ -71,7 +71,7 @@ jobs:
           cat > "$RUNNER_TEMP/tea-panel-release-notes.md" <<'NOTES'
           **macOS 13+ · Apple Silicon (arm64)**
 
-          下载 `.dmg`，打开后将 **Tea Panel.app** 拖入 **Applications**。
+          下载 `.dmg`，打开后将 **茶伴** 拖入 **Applications**。
           `.sha256` 文件可用于校验下载内容。
 
           当前安装包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。
@@ -84,5 +84,5 @@ jobs:
           On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
           NOTES
           gh release create "$RELEASE_TAG" "$DMG_PATH" "$DMG_PATH.sha256" \
-            --verify-tag --title "Tea Panel $RELEASE_TAG" \
+            --verify-tag --title "茶伴 / Tea Panel $RELEASE_TAG" \
             --notes-file "$RUNNER_TEMP/tea-panel-release-notes.md" --generate-notes

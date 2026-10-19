@@ -158,7 +158,7 @@ struct TeaMenuView: View {
                 .frame(width: 43, height: 43)
                 .background(TeaStyle.pale, in: RoundedRectangle(cornerRadius: 14))
             VStack(alignment: .leading, spacing: 3) {
-                Text("等一盏茶").font(TeaTypography.font(size: 21, weight: .semibold))
+                Text("茶伴").font(TeaTypography.font(size: 21, weight: .semibold))
                 Text("TEA PANEL").font(TeaTypography.font(size: 9, weight: .semibold)).tracking(2.5).foregroundStyle(TeaStyle.muted)
             }
             Spacer()

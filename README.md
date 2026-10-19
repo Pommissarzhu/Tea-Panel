@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="Resources/AppIcon.png" width="112" alt="Tea Panel 应用图标">
+  <img src="Resources/AppIcon.png" width="112" alt="茶伴应用图标">
 </p>
 
-<h1 align="center">Tea Panel · 等一盏茶</h1>
+<h1 align="center">茶伴 · Tea Panel</h1>
 
 <p align="center">一个安静的 macOS 菜单栏泡茶提醒器。</p>
 
@@ -14,10 +14,10 @@
 
 设置实际注水量，查看建议投茶量，然后按“晾水 → 确认投茶 → 浸泡”的流程泡茶。到点时，静音悬浮卡片会持续显示，直到你处理提醒。
 
-应用界面与默认 README 均使用**简体中文**，同时提供美式英语版本。
+应用在简体中文系统中显示为**茶伴**，英文名为 **Tea Panel**。界面与默认 README 使用**简体中文**，另提供美式英语 README。
 
 <p align="center">
-  <img src="docs/images/brewing-panel.png" width="384" alt="栀子花茶主界面：注水 330 mL，建议干茶 6.6 克">
+  <img src="docs/images/brewing-panel.png" width="384" alt="茶伴主界面：栀子花茶，注水 330 mL，建议干茶 6.6 克">
 </p>
 
 ## 功能
@@ -35,7 +35,7 @@
 
 ### 下载安装包
 
-安装包发布后，可从 [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases) 下载 `Tea-Panel-<版本号>-Apple-Silicon.dmg`。打开磁盘映像，将 **Tea Panel.app** 拖入 **Applications**，再从“应用程序”启动。安装包不需要 Xcode 或 Command Line Tools。
+从 [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases) 下载 `Tea-Panel-<版本号>-Apple-Silicon.dmg`。打开磁盘映像，将**茶伴**拖入 **Applications**，再从“应用程序”启动。安装包不需要 Xcode 或 Command Line Tools。
 
 当前安装包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。首次打开时，macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。
 
@@ -126,4 +126,4 @@ zsh package.sh        # 重新构建并生成 dist/ 下的 DMG 和 SHA-256 校�
 
 ## 许可证
 
-Tea Panel 的原创代码、文档和应用图形采用 [MIT License](LICENSE)。
+茶伴（Tea Panel）的原创代码、文档和应用图形采用 [MIT License](LICENSE)。

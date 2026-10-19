@@ -1,6 +1,6 @@
 # Changelog
 
-This history describes local Tea Panel app versions. The current version is **0.3.8**.
+This history describes Tea Panel (茶伴) app versions. The current version is **0.3.9**.
 
 ## Unreleased
 
@@ -10,6 +10,11 @@ This history describes local Tea Panel app versions. The current version is **0.
 - Organize usage guides, product notes, icon design proposals, and verification records under `docs/`.
 - Add contributing and preference migration documentation, an MIT license, and broader ignore rules for local output.
 - Keep local research material out of the published repository.
+
+## 0.3.9
+
+- Set the Simplified Chinese app name to 茶伴 in macOS, the main panel, menu bar tooltips, and accessibility labels; retain Tea Panel as the English name.
+- Preserve the bundle identifier, on-disk app bundle name, and preference keys so existing installations keep their saved recipes and settings.
 
 ## 0.3.8
 

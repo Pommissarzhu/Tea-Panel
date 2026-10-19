@@ -21,6 +21,9 @@ xcrun swiftc -O -swift-version 6 -target arm64-apple-macosx13.0 \
   Sources/TeaCore.swift Sources/TeaMotion.swift Sources/TeaViews.swift Sources/TeaPanelApp.swift \
   -o "$APP_PATH/Contents/MacOS/TeaPanel"
 cp Resources/Info.plist "$APP_PATH/Contents/Info.plist"
+for localization_path in Resources/*.lproj; do
+  ditto "$localization_path" "$APP_PATH/Contents/Resources/${localization_path:t}"
+done
 codesign --force --sign - "$APP_PATH"
 print "已生成：$APP_PATH"
 

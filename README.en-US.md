@@ -14,7 +14,7 @@
 
 Tea Panel helps you brew a cup of tea while you work. Set your water volume, check the suggested amount of dry tea, and follow the cooling and steeping timers. When it's time to add leaves or remove your infuser, a silent floating card stays visible until you respond.
 
-The app's current interface and default README are in **Simplified Chinese**. This version uses American English; both language versions describe the same app.
+The app is named **茶伴** on Simplified Chinese systems and **Tea Panel** in English. Its current interface and default README are in **Simplified Chinese**. This README uses American English; both versions describe the same app.
 
 <p align="center">
   <img src="docs/images/brewing-panel.png" width="384" alt="Tea Panel showing the gardenia green tea preset, 330 mL of water, and a suggested 6.6 g of dry tea">
@@ -35,7 +35,7 @@ The app's current interface and default README are in **Simplified Chinese**. Th
 
 ### Download the app
 
-Once a release is published, download `Tea-Panel-<version>-Apple-Silicon.dmg` from [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
+Download `Tea-Panel-<version>-Apple-Silicon.dmg` from [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
 
 The current installer is signed ad hoc and is not Developer ID signed or notarized by Apple. On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
 

@@ -11,7 +11,7 @@ zsh build.sh
 zsh build.sh --run
 ```
 
-The build produces `build/Tea Panel.app`, converts `Resources/AppIcon.png` into an `.icns` file using `sips` and `iconutil`, and applies an ad hoc signature. All generated output stays in the ignored `build/` directory.
+The build produces `build/Tea Panel.app`, converts `Resources/AppIcon.png` into an `.icns` file using `sips` and `iconutil`, copies localized app names, and applies an ad hoc signature. The app displays as 茶伴 in Simplified Chinese and Tea Panel in English. Its on-disk bundle name and identifier stay the same so upgrades use the existing installation and preferences. All generated output stays in the ignored `build/` directory.
 
 ## Source map
 
@@ -22,6 +22,7 @@ The build produces `build/Tea Panel.app`, converts `Resources/AppIcon.png` into 
 | `Sources/TeaMotion.swift` | Shared transitions, button feedback, and interruptible panel animations |
 | `Sources/TeaPanelApp.swift` | Menu bar item, AppKit panels, timer updates, and wake handling |
 | `Resources/Info.plist` | App identity, version, and minimum macOS version |
+| `Resources/*.lproj/InfoPlist.strings` | Localized app names and copyright notices |
 | `Tests/TeaCoreTests.swift` | Logic checks with isolated preferences and a controlled clock |
 | `Tests/TeaMotionTests.swift` | Window lifecycle, menu bar action routing, and motion checks |
 
@@ -60,13 +61,13 @@ Earlier manual checks and native rendering probes are documented in the [verific
 
 The **Build and Release** workflow runs on GitHub's `macos-15` Apple Silicon runner. A pushed `v<version>` tag runs the core suite, builds and signs the app, creates a compressed DMG, verifies the signature and disk image, and publishes the DMG and its SHA-256 checksum to GitHub Releases. The tag must exactly match `CFBundleShortVersionString` in `Resources/Info.plist`; a mismatch stops the workflow before testing or building.
 
-1. Set the release version and build number in `Resources/Info.plist`, and update `CHANGELOG.md`. The first release can use the current version, `0.3.8`.
+1. Set a new release version and build number in `Resources/Info.plist`, and update `CHANGELOG.md`.
 2. Run `zsh test.sh` and `zsh package.sh`. The package contains `Tea Panel.app`, a shortcut to Applications, and the MIT license. Output is written to `dist/`.
-3. Commit and push the release source, including `.github/workflows/release.yml` and `package.sh`, then push the matching tag. For version `0.3.8`:
+3. Commit and push the release source, including `.github/workflows/release.yml` and `package.sh`, then push the matching tag. For version `0.3.9`:
 
    ```sh
-   git tag v0.3.8
-   git push origin v0.3.8
+   git tag v0.3.9
+   git push origin v0.3.9
    ```
 
 4. Check the workflow in Actions and the assets in Releases. A failed check or build prevents release creation. An existing release is not overwritten; use a new version for subsequent releases.
@@ -76,7 +77,7 @@ The workflow uses GitHub's automatic `GITHUB_TOKEN` with `contents: write`; no p
 To verify a downloaded installer, keep the DMG and checksum in the same directory and run:
 
 ```sh
-shasum -a 256 -c Tea-Panel-0.3.8-Apple-Silicon.dmg.sha256
+shasum -a 256 -c Tea-Panel-0.3.9-Apple-Silicon.dmg.sha256
 ```
 
 The app remains ad hoc signed. Developer ID signing and Apple notarization require separate Apple credentials and are not part of this workflow. CI runs the core suite; the motion suite and interactive macOS checks remain local verification steps.
