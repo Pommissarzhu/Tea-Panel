@@ -2,6 +2,16 @@ import AppKit
 import SwiftUI
 import Combine
 
+final class TeaMenuHostingView: NSHostingView<TeaMenuView> {
+    override var acceptsFirstResponder: Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        // Clicks on the hosting surface finish editing; text fields handle their own clicks.
+        window?.makeFirstResponder(self)
+        super.mouseDown(with: event)
+    }
+}
+
 final class TeaMenuPanel: NSPanel {
     var onCancel: (() -> Void)?
 
@@ -72,7 +82,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
         menuPanel.hasShadow = true
         menuPanel.onCancel = { [weak self] in self?.hideMenu() }
         menuPanel.setAccessibilityLabel("Tea Panel 泡茶面板")
-        menuPanel.contentView = NSHostingView(rootView: TeaMenuView(
+        let host = TeaMenuHostingView(rootView: TeaMenuView(
             store: store,
             onPrimary: { [weak self] in self?.performPrimary() },
             onSkipCooling: { [weak self] in self?.skipCooling() },
@@ -83,6 +93,8 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
             },
             onQuit: { [weak self] in self?.quit() }
         ))
+        menuPanel.contentView = host
+        menuPanel.initialFirstResponder = host
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
@@ -150,7 +162,10 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
                         min(anchor.minY, visibleFrame.maxY) - size.height - 8)
             frame.origin = NSPoint(x: x, y: y)
         }
-        if !menuMotion.isPresented { menuMotion.show(at: frame) }
+        if !menuMotion.isPresented {
+            menuPanel.makeFirstResponder(menuPanel.contentView)
+            menuMotion.show(at: frame)
+        }
         else {
             NSApp.activate(ignoringOtherApps: true)
             menuPanel.makeKeyAndOrderFront(nil)
@@ -163,6 +178,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func hideMenu() {
+        menuPanel.makeFirstResponder(menuPanel.contentView)
         menuMotion.hide()
     }
 

@@ -31,23 +31,6 @@ struct TeaValueChange: ViewModifier {
     }
 }
 
-struct TeaInputFeedback: ViewModifier {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @FocusState private var isFocused: Bool
-    let color: Color
-
-    func body(content: Content) -> some View {
-        content
-            .focused($isFocused)
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .strokeBorder(color.opacity(isFocused ? 0.6 : 0), lineWidth: 1.5)
-                    .allowsHitTesting(false)
-            }
-            .animation(TeaMotion.animation(TeaMotion.feedback, reduceMotion: reduceMotion), value: isFocused)
-    }
-}
-
 struct TeaHoverFeedback: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isEnabled) private var isEnabled
