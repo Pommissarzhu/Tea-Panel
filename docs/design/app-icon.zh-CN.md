@@ -1,8 +1,10 @@
 # Tea Panel 应用图标
 
-使用内置 `image_gen`（imagegen 技能）生成。原图为 `AppIcon.png`；`build.sh` 负责缩放和打包 `.icns`，无需重新调用生成工具。
+使用内置 `image_gen`（imagegen 技能）生成。原图为 [`Resources/AppIcon.png`](../../Resources/AppIcon.png)；根目录的 [`build.sh`](../../build.sh) 负责缩放和打包 `.icns`，无需重新调用生成工具。
 
 设计：浅鼠尾草绿底、深绿茶杯剪影和单片茶叶。使用扁平几何形状，无立体边框、材质或投影。
+
+备选方案见[图标 v3 提案](proposals/AppIcon-v3.md)。该提案单独保留，尚未替换当前应用图标。
 
 ## 生成提示词
 

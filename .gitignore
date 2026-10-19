@@ -1,2 +1,27 @@
-build/
+# Local build output and compiler caches
+/build/
+/dist/
+/.build/
+/.swiftpm/
+DerivedData/
+
+# Local research material
+/research/
+
+# Packaged macOS apps and installers
+*.app/
+*.dmg
+*.pkg
+
+# macOS and editor state
 .DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.xcuserstate
+xcuserdata/
+
+# Local environment settings
+.env
+.env.*
+!.env.example
