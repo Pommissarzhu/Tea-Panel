@@ -1,0 +1,88 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate version
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: |
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
+          if [[ -n "$RELEASE_TAG" && "$RELEASE_TAG" != "v$version" ]]; then
+            echo "::error::Tag $RELEASE_TAG must match the app version v$version."
+            exit 1
+          fi
+          echo "number=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Show build environment
+        run: |
+          uname -m
+          xcodebuild -version
+          xcrun swiftc --version
+
+      - name: Run core regression checks
+        run: zsh test.sh
+
+      - name: Build and package DMG
+        run: zsh package.sh
+
+      - name: Save installer artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Tea-Panel-${{ steps.version.outputs.number }}-Apple-Silicon
+          path: |
+            dist/Tea-Panel-${{ steps.version.outputs.number }}-Apple-Silicon.dmg
+            dist/Tea-Panel-${{ steps.version.outputs.number }}-Apple-Silicon.dmg.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish GitHub Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          DMG_PATH: dist/Tea-Panel-${{ steps.version.outputs.number }}-Apple-Silicon.dmg
+        run: |
+          cat > "$RUNNER_TEMP/tea-panel-release-notes.md" <<'NOTES'
+          **macOS 13+ · Apple Silicon (arm64)**
+
+          下载 `.dmg`，打开后将 **Tea Panel.app** 拖入 **Applications**。
+          `.sha256` 文件可用于校验下载内容。
+
+          当前安装包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。
+          首次打开时，macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。
+
+          Download the `.dmg`, open it, and drag **Tea Panel.app** into **Applications**.
+          Use the `.sha256` file to verify the download.
+
+          This build is signed ad hoc and is not Developer ID signed or notarized by Apple.
+          On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
+          NOTES
+          gh release create "$RELEASE_TAG" "$DMG_PATH" "$DMG_PATH.sha256" \
+            --verify-tag --title "Tea Panel $RELEASE_TAG" \
+            --notes-file "$RUNNER_TEMP/tea-panel-release-notes.md" --generate-notes

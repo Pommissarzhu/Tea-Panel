@@ -4,6 +4,8 @@ This history describes local Tea Panel app versions. The current version is **0.
 
 ## Unreleased
 
+- Add tag-triggered GitHub Actions builds that test, package, and publish an Apple Silicon DMG and SHA-256 checksum to GitHub Releases, plus manual artifact builds.
+- Add `package.sh` for local DMG packaging and document installation and release steps in both READMEs.
 - Add a Simplified Chinese default README and a matching American English README, with an app screenshot.
 - Organize usage guides, product notes, icon design proposals, and verification records under `docs/`.
 - Add contributing and preference migration documentation, an MIT license, and broader ignore rules for local output.

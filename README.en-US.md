@@ -33,7 +33,13 @@ The app's current interface and default README are in **Simplified Chinese**. Th
 
 ## Quick start
 
-### Requirements
+### Download the app
+
+Once a release is published, download `Tea-Panel-<version>-Apple-Silicon.dmg` from [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
+
+The current installer is signed ad hoc and is not Developer ID signed or notarized by Apple. On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
+
+### Build from source
 
 - A Mac with **Apple Silicon** running **macOS 13 Ventura or later**.
 - Xcode Command Line Tools with a **Swift 6** compiler and the macOS SDK.
@@ -48,7 +54,7 @@ zsh build.sh --run
 
 The script builds and opens `build/Tea Panel.app`. You can also build with `zsh build.sh` and open the app yourself, or copy it to your Applications folder. The menu opens on launch; click its menu bar icon to open it again.
 
-The build script currently targets `arm64` and signs the app ad hoc. Distributing a Developer ID signed, notarized app requires a separate release process.
+The build script currently targets `arm64`. Local builds and GitHub Actions installers use ad hoc signing.
 
 ## Brew your first cup
 
@@ -83,17 +89,22 @@ zsh build.sh          # Build build/Tea Panel.app
 zsh build.sh --run    # Build and launch
 zsh test.sh           # Run core logic checks
 zsh test.sh --motion  # Also run window and menu bar checks; requires a macOS GUI session
+zsh package.sh        # Rebuild and create a DMG and SHA-256 checksum in dist/
 ```
 
 The current suites contain **193 core checks** and **68 motion and menu bar checks**. Full-screen behavior, multiple displays, and physical sleep/wake interactions still need hands-on verification. See [Contributing](CONTRIBUTING.md) for the source map and validation scope.
 
+Pushing a `v<version>` tag that matches the app version runs the core checks, builds the app, verifies its signature, packages a DMG, and publishes it to GitHub Releases. You can also run **Build and Release** manually from Actions to create downloadable build artifacts without publishing a release. See [Contributing](CONTRIBUTING.md#releases) for release steps.
+
 ```text
 .
+├── .github/workflows/ # GitHub Actions packaging and releases
 ├── Sources/          # SwiftUI views, AppKit integration, timer logic, and motion
 ├── Resources/        # App metadata and the active app icon
 ├── Tests/            # Core and window regression checks
 ├── docs/             # Usage guides, screenshots, design notes, and verification records
 ├── build.sh          # Local app build
+├── package.sh        # DMG packaging and verification
 └── test.sh           # Local test runner
 ```
 

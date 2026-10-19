@@ -30,6 +30,7 @@ The build produces `build/Tea Panel.app`, converts `Resources/AppIcon.png` into 
 ```sh
 zsh -n build.sh
 zsh -n test.sh
+zsh -n package.sh
 zsh test.sh
 zsh test.sh --motion
 zsh build.sh
@@ -54,6 +55,31 @@ The repository cleanup was checked locally on **October 19, 2026**, using **Appl
 The deployment target is macOS 13; this run does not establish behavior on every supported macOS version. Full-screen apps, multiple displays, physical sleep/wake interactions, real mouse tracking of the menu bar, and the system's actual Reduce Motion toggle still need hands-on verification. The motion suite injects the Reduce Motion preference without changing system settings.
 
 Earlier manual checks and native rendering probes are documented in the [verification history](docs/verification.zh-CN.md).
+
+## Releases
+
+The **Build and Release** workflow runs on GitHub's `macos-15` Apple Silicon runner. A pushed `v<version>` tag runs the core suite, builds and signs the app, creates a compressed DMG, verifies the signature and disk image, and publishes the DMG and its SHA-256 checksum to GitHub Releases. The tag must exactly match `CFBundleShortVersionString` in `Resources/Info.plist`; a mismatch stops the workflow before testing or building.
+
+1. Set the release version and build number in `Resources/Info.plist`, and update `CHANGELOG.md`. The first release can use the current version, `0.3.8`.
+2. Run `zsh test.sh` and `zsh package.sh`. The package contains `Tea Panel.app`, a shortcut to Applications, and the MIT license. Output is written to `dist/`.
+3. Commit and push the release source, including `.github/workflows/release.yml` and `package.sh`, then push the matching tag. For version `0.3.8`:
+
+   ```sh
+   git tag v0.3.8
+   git push origin v0.3.8
+   ```
+
+4. Check the workflow in Actions and the assets in Releases. A failed check or build prevents release creation. An existing release is not overwritten; use a new version for subsequent releases.
+
+The workflow uses GitHub's automatic `GITHUB_TOKEN` with `contents: write`; no personal access token or Apple signing secret is required. Enable GitHub Actions for the repository if it is disabled. **Run workflow** provides a manual build that saves the DMG and checksum as an Actions artifact for 14 days without creating a release.
+
+To verify a downloaded installer, keep the DMG and checksum in the same directory and run:
+
+```sh
+shasum -a 256 -c Tea-Panel-0.3.8-Apple-Silicon.dmg.sha256
+```
+
+The app remains ad hoc signed. Developer ID signing and Apple notarization require separate Apple credentials and are not part of this workflow. CI runs the core suite; the motion suite and interactive macOS checks remain local verification steps.
 
 ## Keep changes focused
 

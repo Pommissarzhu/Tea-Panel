@@ -33,7 +33,13 @@
 
 ## 快速开始
 
-### 环境要求
+### 下载安装包
+
+安装包发布后，可从 [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases) 下载 `Tea-Panel-<版本号>-Apple-Silicon.dmg`。打开磁盘映像，将 **Tea Panel.app** 拖入 **Applications**，再从“应用程序”启动。安装包不需要 Xcode 或 Command Line Tools。
+
+当前安装包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。首次打开时，macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。
+
+### 从源码构建
 
 - **Apple Silicon** Mac，运行 **macOS 13 Ventura 或更高版本**。
 - Xcode Command Line Tools，包含 **Swift 6** 编译器和 macOS SDK。
@@ -48,7 +54,7 @@ zsh build.sh --run
 
 脚本会生成并打开 `build/Tea Panel.app`。也可用 `zsh build.sh` 只构建，再自行打开，或将应用复制到“应用程序”目录。启动后菜单会展开，之后点击菜单栏图标即可再次打开。
 
-构建脚本目前仅面向 `arm64`，使用本地临时签名（ad hoc）。通过 Developer ID 签名和 Apple 公证分发应用，需要单独的发布流程。
+构建脚本目前仅面向 `arm64`，本地构建和 GitHub Actions 安装包均使用临时签名（ad hoc）。
 
 ## 泡第一杯茶
 
@@ -83,17 +89,22 @@ zsh build.sh          # 生成 build/Tea Panel.app
 zsh build.sh --run    # 构建并打开
 zsh test.sh           # 运行核心逻辑检查
 zsh test.sh --motion  # 另查窗口和菜单栏行为，需要 macOS 图形会话
+zsh package.sh        # 重新构建并生成 dist/ 下的 DMG 和 SHA-256 校验文件
 ```
 
 当前测试包括 **193 项核心检查**和 **68 项动效与菜单栏检查**。全屏、多显示器和实际合盖唤醒仍需对应环境下的交互验收。代码结构和验证范围见[贡献指南](CONTRIBUTING.md)。
 
+推送与应用版本一致的 `v<版本号>` 标签后，GitHub Actions 会运行核心检查、编译、校验签名、打包 DMG，并发布到 GitHub Releases。也可在 Actions 中手动运行 **Build and Release**，仅生成可下载的构建产物。发布步骤见[贡献指南](CONTRIBUTING.md#releases)。
+
 ```text
 .
+├── .github/workflows/ # GitHub Actions 自动打包与发布
 ├── Sources/          # SwiftUI 界面、AppKit 集成、计时逻辑和动效
 ├── Resources/        # 应用元数据和当前图标
 ├── Tests/            # 核心逻辑及窗口回归检查
 ├── docs/             # 使用指南、截图、设计说明和验收记录
 ├── build.sh          # 本地构建脚本
+├── package.sh        # DMG 打包与校验
 └── test.sh           # 本地测试脚本
 ```
 
