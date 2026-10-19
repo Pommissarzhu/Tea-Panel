@@ -19,6 +19,53 @@ enum TeaMotion {
     }
 }
 
+struct TeaValueChange: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let value: String
+    var numeric = false
+
+    func body(content: Content) -> some View {
+        content
+            .contentTransition(numeric && !reduceMotion ? .numericText() : .opacity)
+            .animation(TeaMotion.animation(TeaMotion.selection, reduceMotion: reduceMotion), value: value)
+    }
+}
+
+struct TeaInputFeedback: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @FocusState private var isFocused: Bool
+    let color: Color
+
+    func body(content: Content) -> some View {
+        content
+            .focused($isFocused)
+            .overlay {
+                RoundedRectangle(cornerRadius: 6)
+                    .strokeBorder(color.opacity(isFocused ? 0.6 : 0), lineWidth: 1.5)
+                    .allowsHitTesting(false)
+            }
+            .animation(TeaMotion.animation(TeaMotion.feedback, reduceMotion: reduceMotion), value: isFocused)
+    }
+}
+
+struct TeaHoverFeedback: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isEnabled) private var isEnabled
+    @TeaViewState private var isHovering = false
+    let color: Color
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                RoundedRectangle(cornerRadius: 9)
+                    .strokeBorder(color.opacity(isEnabled && isHovering ? 0.4 : 0), lineWidth: 1)
+                    .allowsHitTesting(false)
+            }
+            .onHover { isHovering = $0 }
+            .animation(TeaMotion.animation(TeaMotion.feedback, reduceMotion: reduceMotion), value: isHovering)
+    }
+}
+
 struct TeaButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.modifier(TeaButtonFeedback(isPressed: configuration.isPressed))
@@ -48,37 +95,50 @@ final class TeaPanelMotion {
     enum Style {
         case menu, reminder
 
-        var entranceDuration: TimeInterval { self == .reminder ? 0.36 : 0.22 }
+        var entranceDuration: TimeInterval { self == .reminder ? 0.36 : 0.3 }
         var exitDuration: TimeInterval { self == .reminder ? 0.22 : 0.16 }
-        var entranceOffset: CGFloat { self == .reminder ? -12 : 6 }
+        var entranceOffset: CGFloat { self == .reminder ? -12 : 10 }
         var exitOffset: CGFloat { self == .reminder ? 6 : 4 }
     }
 
     private let panel: NSPanel
     private let style: Style
+    private let reduceMotion: () -> Bool
     private var generation = 0
+    private var isDismissing = false
     private(set) var isPresented = false
 
-    init(panel: NSPanel, style: Style) {
+    init(panel: NSPanel, style: Style,
+         reduceMotion: @escaping () -> Bool = { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }) {
         self.panel = panel
         self.style = style
+        self.reduceMotion = reduceMotion
     }
 
     func show(at frame: NSRect) {
+        // App activation can order a panel in before this method runs. Logical visibility,
+        // rather than NSWindow.isVisible alone, determines whether to prepare an entrance.
+        let continuesDismissal = isDismissing && panel.isVisible
+        let startsEntrance = (!isPresented && !continuesDismissal) || !panel.isVisible
         generation += 1
         isPresented = true
+        isDismissing = false
         panel.ignoresMouseEvents = false
-        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        if !panel.isVisible {
+        let reduceMotion = reduceMotion()
+        if startsEntrance {
             panel.alphaValue = 0
             panel.setFrame(reduceMotion ? frame : frame.offsetBy(dx: 0, dy: style.entranceOffset), display: false)
         }
-        if style == .menu { panel.makeKeyAndOrderFront(nil) }
+        if style == .menu {
+            // Prepare opacity and position before activation can make the panel visible.
+            NSApp.activate(ignoringOtherApps: true)
+            panel.makeKeyAndOrderFront(nil)
+        }
         else { panel.orderFrontRegardless() }
 
         NSAnimationContext.runAnimationGroup { context in
             context.duration = reduceMotion ? 0.1 : style.entranceDuration
-            context.timingFunction = CAMediaTimingFunction(controlPoints: 0.22, 1, 0.36, 1)
+            context.timingFunction = CAMediaTimingFunction(controlPoints: 0.2, 0.75, 0.25, 1)
             panel.animator().alphaValue = 1
             panel.animator().setFrame(frame, display: true)
         }
@@ -87,10 +147,11 @@ final class TeaPanelMotion {
     func hide() {
         guard isPresented else { return }
         isPresented = false
+        isDismissing = true
         generation += 1
         let dismissal = generation
         let frame = panel.frame
-        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        let reduceMotion = reduceMotion()
         // The outgoing card must not accept a second confirmation during its fade.
         panel.ignoresMouseEvents = true
         NSAnimationContext.runAnimationGroup({ context in
@@ -103,6 +164,7 @@ final class TeaPanelMotion {
         }, completionHandler: { [weak self] in
             MainActor.assumeIsolated {
                 guard let self, self.generation == dismissal, !self.isPresented else { return }
+                self.isDismissing = false
                 self.panel.orderOut(nil)
                 self.panel.alphaValue = 1
                 self.panel.setFrame(frame, display: false)

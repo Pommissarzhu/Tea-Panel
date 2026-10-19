@@ -26,6 +26,7 @@ enum TeaStyle {
 
 struct TeaMenuView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @TeaViewState private var configurationFeedbackID = 0
     @ObservedObject var store: TeaStore
     let onPrimary: () -> Void
     let onSkipCooling: () -> Void
@@ -42,7 +43,8 @@ struct TeaMenuView: View {
                     modePicker
                     if let message = store.configurationMessage {
                         Text(message).font(.system(size: 11)).foregroundStyle(TeaStyle.green)
-                            .transition(.opacity)
+                            .id(configurationFeedbackID)
+                            .transition(TeaMotion.transition(reduceMotion: reduceMotion))
                     }
                     if store.showsSettings {
                         VStack(spacing: 14) {
@@ -68,6 +70,7 @@ struct TeaMenuView: View {
                 .padding(22)
                 .animation(TeaMotion.animation(TeaMotion.content, reduceMotion: reduceMotion), value: store.showsSettings)
                 .animation(TeaMotion.animation(TeaMotion.content, reduceMotion: reduceMotion), value: store.configurationMessage)
+                .animation(TeaMotion.animation(TeaMotion.selection, reduceMotion: reduceMotion), value: configurationFeedbackID)
             }
             footer
         }
@@ -95,7 +98,7 @@ struct TeaMenuView: View {
             }
             Spacer()
             Button {
-                store.showsSettings.toggle()
+                change { store.showsSettings.toggle() }
             } label: {
                 Image(systemName: "slider.horizontal.3")
                     .font(.system(size: 16)).frame(width: 32, height: 32)
@@ -112,7 +115,7 @@ struct TeaMenuView: View {
         HStack(spacing: 7) {
             ForEach(TeaKind.allCases) { tea in
                 let selected = !store.isCustomMode && store.tea == tea
-                Button { store.selectTea(tea) } label: {
+                Button { change { store.selectTea(tea) } } label: {
                     VStack(spacing: 7) {
                         Image(systemName: tea.symbol).font(.system(size: 18, weight: .medium))
                         Text(tea.name).font(.system(size: 12, weight: selected ? .semibold : .regular))
@@ -133,8 +136,10 @@ struct TeaMenuView: View {
     private var modePicker: some View {
         HStack(spacing: 8) {
             Button {
-                store.enterCustomMode()
-                store.showsSettings = true
+                change {
+                    store.enterCustomMode()
+                    store.showsSettings = true
+                }
             } label: {
                 Label(store.isCustomMode && store.hasUnsavedChanges ? "自定义 · 未保存" : "自定义",
                       systemImage: store.isCustomMode ? store.configuration.icon.rawValue : "slider.horizontal.3")
@@ -142,10 +147,11 @@ struct TeaMenuView: View {
                     .padding(.horizontal, 10).padding(.vertical, 8)
                     .background(store.isCustomMode ? TeaStyle.forest : Color.white.opacity(0.7), in: Capsule())
                     .foregroundStyle(store.isCustomMode ? TeaStyle.background : TeaStyle.green)
+                    .modifier(TeaValueChange(value: store.hasUnsavedChanges.description))
                     .animation(TeaMotion.animation(TeaMotion.selection, reduceMotion: reduceMotion), value: store.isCustomMode)
             }.buttonStyle(TeaButtonStyle()).disabled(store.isActive && !store.isCustomMode)
             if store.isCustomMode {
-                Button(store.savedConfiguration == nil ? "保存" : "更新") { store.saveConfiguration() }
+                Button(store.savedConfiguration == nil ? "保存" : "更新") { saveConfiguration() }
                     .buttonStyle(TeaButtonStyle()).font(.system(size: 11, weight: .semibold))
                     .disabled(store.savedConfiguration == nil && !store.canSaveAsNew)
                     .transition(.opacity)
@@ -157,16 +163,20 @@ struct TeaMenuView: View {
                 }
                 ForEach(store.customConfigurations) { configuration in
                     Button {
-                        store.selectCustomConfiguration(id: configuration.id)
-                        store.showsSettings = false
+                        change {
+                            store.selectCustomConfiguration(id: configuration.id)
+                            store.showsSettings = false
+                        }
                     } label: {
                         Label(configuration.name, systemImage: configuration.icon.rawValue)
                     }
                 }
             } label: {
                 Text("已存 \(store.customConfigurations.count)/10").font(.system(size: 11))
+                    .modifier(TeaValueChange(value: String(store.customConfigurations.count), numeric: true))
             }
             .menuStyle(.borderlessButton).fixedSize().disabled(store.isActive)
+            .modifier(TeaHoverFeedback(color: TeaStyle.green))
         }
         .animation(TeaMotion.animation(TeaMotion.selection, reduceMotion: reduceMotion), value: store.isCustomMode)
     }
@@ -180,6 +190,7 @@ struct TeaMenuView: View {
                 Spacer()
                 Text("第 \(store.displayedInfusion) 泡")
                     .font(.system(size: 11, weight: .semibold))
+                    .modifier(TeaValueChange(value: String(store.displayedInfusion), numeric: true))
                     .padding(.horizontal, 9).padding(.vertical, 5)
                     .background(TeaStyle.pale, in: Capsule())
             }
@@ -188,6 +199,7 @@ struct TeaMenuView: View {
                     if store.phase == .idle && store.displayedInfusion > 1 {
                         Text(teaDuration(store.currentBrewSeconds))
                             .font(.system(size: 34, weight: .light, design: .rounded)).monospacedDigit()
+                            .modifier(TeaValueChange(value: String(store.currentBrewSeconds), numeric: true))
                             .frame(height: 69, alignment: .leading)
                         Text("本泡浸泡 · 沿用原茶叶，不再加干茶")
                             .font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
@@ -195,9 +207,11 @@ struct TeaMenuView: View {
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
                             Text(teaGrams(store.recommendedGrams))
                                 .font(.system(size: 58, weight: .light, design: .rounded)).monospacedDigit()
+                                .modifier(TeaValueChange(value: teaGrams(store.recommendedGrams), numeric: true))
                             Text("克").font(.system(size: 17, weight: .medium)).foregroundStyle(TeaStyle.muted)
                         }
                         Text("\(store.isCustomMode ? "自定义" : "建议干茶") · \(store.tea.detail)").font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
+                            .modifier(TeaValueChange(value: store.tea.rawValue + store.isCustomMode.description))
                     } else if store.phase == .cooling || store.phase == .brewing {
                         Text(teaClock(store.remainingSeconds))
                             .font(.system(size: 57, weight: .light, design: .rounded)).monospacedDigit()
@@ -270,6 +284,7 @@ struct TeaMenuView: View {
                     HStack(alignment: .firstTextBaseline, spacing: 3) {
                         Text("\(store.startingInfusion)")
                             .font(.system(size: 19, weight: .medium, design: .rounded)).monospacedDigit()
+                            .modifier(TeaValueChange(value: String(store.startingInfusion), numeric: true))
                         Text("泡").font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
                     }
                     .frame(maxWidth: .infinity)
@@ -287,7 +302,7 @@ struct TeaMenuView: View {
     }
 
     private func infusionButton(_ symbol: String, label: String, enabled: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button { change(action) } label: {
             Image(systemName: symbol).font(.system(size: 10, weight: .semibold))
                 .frame(width: 26, height: 26)
                 .foregroundStyle(symbol == "plus" ? TeaStyle.background : TeaStyle.forest)
@@ -302,10 +317,13 @@ struct TeaMenuView: View {
         VStack(alignment: .leading, spacing: 7) {
             Text(label).font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
             HStack(spacing: 4) {
-                TextField(label, value: value, format: .number.precision(.fractionLength(0...1)))
+                TextField(label, value: Binding(get: { value.wrappedValue }, set: { newValue in
+                    change { value.wrappedValue = newValue }
+                }), format: .number.precision(.fractionLength(0...1)))
                     .textFieldStyle(.plain).font(.system(size: 19, weight: .medium, design: .rounded))
                     .monospacedDigit()
                     .accessibilityLabel(label)
+                    .modifier(TeaInputFeedback(color: TeaStyle.green))
                 Text(suffix).font(.system(size: 12)).foregroundStyle(TeaStyle.muted)
             }
             .frame(height: 26)
@@ -354,6 +372,7 @@ struct TeaMenuView: View {
         VStack(spacing: 6) {
             Text(label).font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
             Text(value).font(.system(size: 12, weight: .medium))
+                .modifier(TeaValueChange(value: value, numeric: true))
         }.frame(maxWidth: .infinity)
     }
 
@@ -361,8 +380,9 @@ struct TeaMenuView: View {
         VStack(spacing: 10) {
             if !store.isActive, let error = store.validationMessage {
                 Text(error).font(.system(size: 11)).foregroundStyle(.red)
+                    .transition(TeaMotion.transition(reduceMotion: reduceMotion))
             }
-            Button(action: onPrimary) {
+            Button { change(onPrimary) } label: {
                 HStack(spacing: 8) {
                     Text(primaryTitle)
                         .id(primaryTitle).transition(.opacity)
@@ -381,9 +401,9 @@ struct TeaMenuView: View {
             if store.isActive {
                 if store.phase == .preparingRefill && store.canSkipCooling { skipCoolingButton }
                 HStack {
-                    Button("换新茶叶", action: onEnd)
+                    Button("换新茶叶") { change(onEnd) }
                     Spacer()
-                    Button("结束本轮", action: onEnd)
+                    Button("结束本轮") { change(onEnd) }
                 }.buttonStyle(TeaButtonStyle()).font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
             } else if store.canSkipCooling {
                 HStack {
@@ -398,10 +418,11 @@ struct TeaMenuView: View {
                     .font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
             }
         }
+        .animation(TeaMotion.animation(TeaMotion.content, reduceMotion: reduceMotion), value: store.validationMessage)
     }
 
     private var skipCoolingButton: some View {
-        Button(action: onSkipCooling) {
+        Button { change(onSkipCooling) } label: {
             Label("跳过晾水，直接泡茶", systemImage: "forward.end.fill")
                 .font(.system(size: 11, weight: .medium))
         }
@@ -418,8 +439,11 @@ struct TeaMenuView: View {
                 Spacer()
                 Text(store.tea.name).font(.system(size: 11)).foregroundStyle(TeaStyle.muted)
             }
-            TextField("配置名称", text: Binding(get: { store.configuration.name }, set: { store.setConfigurationName($0) }))
+            TextField("配置名称", text: Binding(get: { store.configuration.name }, set: { name in
+                change { store.setConfigurationName(name) }
+            }))
                 .textFieldStyle(.roundedBorder).font(.system(size: 13)).accessibilityLabel("自定义配置名称")
+                .modifier(TeaInputFeedback(color: TeaStyle.green))
             iconPicker
             numberField("水 : 干茶（重量比）", suffix: ": 1", value: ratioBinding)
             temperatureSetting
@@ -428,9 +452,11 @@ struct TeaMenuView: View {
             timeSetting("每次续泡增加", keyPath: \.incrementSeconds, range: 0...600, step: 15, zeroText: "不额外加时")
             Text(store.isActive ? "本轮用量和名称保持不变；时间修改用于下一泡，其余修改用于下一轮。" : "修改任意参数即进入自定义模式。草稿自动保留，点击保存后加入配置列表。")
                 .font(.system(size: 10)).foregroundStyle(TeaStyle.muted).fixedSize(horizontal: false, vertical: true)
-            if store.isCustomMode { configurationControls }
+            if store.isCustomMode {
+                configurationControls.transition(TeaMotion.transition(reduceMotion: reduceMotion))
+            }
             Button {
-                store.showsSettings = false
+                change { store.showsSettings = false }
             } label: {
                 Text("返回泡茶").font(.system(size: 12, weight: .semibold))
                     .frame(maxWidth: .infinity).padding(.vertical, 11)
@@ -461,7 +487,7 @@ struct TeaMenuView: View {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 5), spacing: 6) {
                 ForEach(TeaIcon.allCases) { icon in
                     let selected = store.configuration.icon == icon
-                    Button { store.setConfigurationIcon(icon) } label: {
+                    Button { change { store.setConfigurationIcon(icon) } } label: {
                         Image(systemName: icon.rawValue).font(.system(size: 17))
                             .frame(maxWidth: .infinity).frame(height: 34)
                             .background(selected ? TeaStyle.forest : TeaStyle.pale.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
@@ -481,12 +507,17 @@ struct TeaMenuView: View {
                     .font(.system(size: 10)).foregroundStyle(TeaStyle.muted)
             }
             HStack {
-                Button(store.savedConfiguration == nil ? "保存配置" : "更新配置") { store.saveConfiguration() }
+                Button(store.savedConfiguration == nil ? "保存配置" : "更新配置") { saveConfiguration() }
                     .disabled(store.savedConfiguration == nil && !store.canSaveAsNew)
                 if store.savedConfiguration != nil {
-                    Button("另存为新配置") { store.saveConfiguration(asNew: true) }.disabled(!store.canSaveAsNew)
+                    Button("另存为新配置") { saveConfiguration(asNew: true) }.disabled(!store.canSaveAsNew)
                     Spacer(minLength: 0)
-                    Button("删除") { store.deleteSelectedConfiguration() }
+                    Button("删除") {
+                        change {
+                            store.deleteSelectedConfiguration()
+                            configurationFeedbackID += 1
+                        }
+                    }
                         .foregroundStyle(.red).disabled(store.isActive)
                 }
             }.buttonStyle(TeaButtonStyle()).font(.system(size: 11, weight: .medium))
@@ -500,14 +531,15 @@ struct TeaMenuView: View {
                 Spacer()
                 Text("\(store.configuration.waterTemperatureC)°C")
                     .font(.system(size: 16, weight: .medium, design: .rounded)).monospacedDigit()
+                    .modifier(TeaValueChange(value: String(store.configuration.waterTemperatureC), numeric: true))
             }
             Slider(value: Binding(get: { Double(store.configuration.waterTemperatureC) },
-                                  set: { store.setTemperature(Int($0.rounded())) }), in: 50...100, step: 5)
+                                  set: { temperature in change { store.setTemperature(Int(temperature.rounded())) } }), in: 50...100, step: 5)
                 .accessibilityLabel("参考水温")
             HStack(spacing: 5) {
                 ForEach([70, 80, 85, 90, 95, 100], id: \.self) { temperature in
                     let selected = store.configuration.waterTemperatureC == temperature
-                    Button { store.setTemperature(temperature) } label: {
+                    Button { change { store.setTemperature(temperature) } } label: {
                         Text("\(temperature)°")
                             .font(.system(size: 10, weight: .medium)).monospacedDigit()
                             .frame(maxWidth: .infinity).padding(.vertical, 5)
@@ -525,7 +557,9 @@ struct TeaMenuView: View {
 
     private func timeSetting(_ title: String, keyPath: WritableKeyPath<TeaRecipe, Int>, range: ClosedRange<Int>, step: Int, zeroText: String? = nil) -> some View {
         let value = Binding(get: { store.recipe[keyPath: keyPath] },
-                            set: { newValue in store.updateRecipe(for: store.tea) { $0[keyPath: keyPath] = newValue } })
+                            set: { newValue in change {
+                                store.updateRecipe(for: store.tea) { $0[keyPath: keyPath] = newValue }
+                            } })
         let minutes = Binding(get: { value.wrappedValue / 60 }, set: { minutes in
             guard minutes != value.wrappedValue / 60 else { return }
             value.wrappedValue = min(range.upperBound, max(range.lowerBound, minutes * 60 + value.wrappedValue % 60))
@@ -559,6 +593,7 @@ struct TeaMenuView: View {
             }.pickerStyle(.inline).labelsHidden()
         } label: {
             Text("\(String(format: "%02d", selection.wrappedValue)) \(unit)")
+                .modifier(TeaValueChange(value: String(selection.wrappedValue), numeric: true))
         }
         .menuStyle(.borderlessButton).menuIndicator(.visible)
         .font(.system(size: 13, weight: .medium, design: .rounded)).monospacedDigit()
@@ -571,6 +606,7 @@ struct TeaMenuView: View {
         .accessibilityLabel(label).accessibilityValue("\(selection.wrappedValue) \(unit)")
         .help(label)
         .disabled(options.count < 2)
+        .modifier(TeaHoverFeedback(color: TeaStyle.green))
     }
 
     private var footer: some View {
@@ -588,6 +624,17 @@ struct TeaMenuView: View {
         .padding(.horizontal, 22).padding(.vertical, 15)
         .background(TeaStyle.background)
         .overlay(alignment: .top) { Rectangle().fill(TeaStyle.border.opacity(0.6)).frame(height: 0.5) }
+    }
+
+    private func change(_ action: () -> Void) {
+        withAnimation(TeaMotion.animation(TeaMotion.content, reduceMotion: reduceMotion), action)
+    }
+
+    private func saveConfiguration(asNew: Bool = false) {
+        change {
+            store.saveConfiguration(asNew: asNew)
+            configurationFeedbackID += 1
+        }
     }
 
     private var heroEyebrow: String {

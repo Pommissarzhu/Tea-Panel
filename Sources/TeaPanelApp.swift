@@ -21,7 +21,8 @@ final class ReminderPanel: NSPanel {
 
 @MainActor
 final class TeaAppDelegate: NSObject, NSApplicationDelegate {
-    private let store = TeaStore()
+    private let store: TeaStore
+    private let opensOnLaunch: Bool
     private var statusItem: NSStatusItem!
     private let menuPanel = TeaMenuPanel(
         contentRect: NSRect(x: 0, y: 0, width: 384, height: 668),
@@ -36,6 +37,17 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
     private var clock: Timer?
     private var wakeObservation: NSObjectProtocol?
     private var lastStatusSymbol: String?
+    private var isQuitting = false
+
+    init(store: TeaStore = TeaStore(), opensOnLaunch: Bool = true) {
+        self.store = store
+        self.opensOnLaunch = opensOnLaunch
+        super.init()
+    }
+
+    #if TEA_PANEL_TESTING
+    var statusButtonForTesting: NSStatusBarButton { statusItem.button! }
+    #endif
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -50,6 +62,8 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
         }
 
         menuPanel.isFloatingPanel = true
+        menuPanel.hidesOnDeactivate = false
+        menuPanel.animationBehavior = .none
         menuPanel.isReleasedWhenClosed = false
         menuPanel.level = .statusBar
         menuPanel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
@@ -67,10 +81,16 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
                 self?.hideMenu()
                 self?.store.previewReminder()
             },
-            onQuit: { NSApp.terminate(nil) }
+            onQuit: { [weak self] in self?.quit() }
         ))
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            MainActor.assumeIsolated { self?.hideMenu() }
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                // A status-button click belongs to toggleMenu; do not close on mouse-down
+                // and then reopen on the button's mouse-up action.
+                if self.statusButtonFrame?.contains(NSEvent.mouseLocation) == true { return }
+                self.hideMenu()
+            }
         }
 
         observation = store.objectWillChange.sink { [weak self] _ in
@@ -93,7 +113,9 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated { self?.store.tick() }
         }
         updateStatus()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in self?.showMenu() }
+        if opensOnLaunch {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in self?.showMenu() }
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -115,12 +137,11 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showMenu() {
-        guard let button = statusItem.button, let window = button.window,
+        guard let window = statusItem.button?.window, let anchor = statusButtonFrame,
               let screen = window.screen ?? NSScreen.main else { return }
         // Position only when opening. Status text and template changes cannot move an open panel.
         var frame = menuPanel.frame
         if !menuMotion.isPresented {
-            let anchor = window.convertToScreen(button.convert(button.bounds, to: nil))
             let visibleFrame = screen.visibleFrame
             let size = menuPanel.frame.size
             let x = min(max(anchor.midX - size.width / 2, visibleFrame.minX + 8),
@@ -129,13 +150,28 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
                         min(anchor.minY, visibleFrame.maxY) - size.height - 8)
             frame.origin = NSPoint(x: x, y: y)
         }
-        NSApp.activate(ignoringOtherApps: true)
         if !menuMotion.isPresented { menuMotion.show(at: frame) }
-        else { menuPanel.makeKeyAndOrderFront(nil) }
+        else {
+            NSApp.activate(ignoringOtherApps: true)
+            menuPanel.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    private var statusButtonFrame: NSRect? {
+        guard let button = statusItem.button, let window = button.window else { return nil }
+        return window.convertToScreen(button.convert(button.bounds, to: nil))
     }
 
     private func hideMenu() {
         menuMotion.hide()
+    }
+
+    private func quit() {
+        guard !isQuitting else { return }
+        isQuitting = true
+        menuMotion.hide()
+        reminderMotion?.hide()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) { NSApp.terminate(nil) }
     }
 
     private func updateStatus() {
@@ -178,6 +214,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
             styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false
         )
         panel.isFloatingPanel = true
+        panel.animationBehavior = .none
         panel.hidesOnDeactivate = false
         panel.isReleasedWhenClosed = false
         panel.level = .statusBar
@@ -214,6 +251,7 @@ final class TeaAppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+#if !TEA_PANEL_TESTING
 @main
 enum TeaPanelMain {
     @MainActor static func main() {
@@ -225,3 +263,4 @@ enum TeaPanelMain {
         withExtendedLifetime(delegate) {}
     }
 }
+#endif
