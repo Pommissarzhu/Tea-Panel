@@ -4,6 +4,9 @@
 /.build/
 /.swiftpm/
 DerivedData/
+**/bin/
+**/obj/
+.vs/
 
 # Local research material
 /research/

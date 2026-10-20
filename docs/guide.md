@@ -1,5 +1,7 @@
 # Usage guide
 
+Core brewing rules are shared by both platforms. Control descriptions below use macOS; see the [Windows guide](windows-guide.md) for tray behavior, timing dropdowns, and build commands.
+
 **English (US)** | [简体中文](guide.zh-CN.md)
 
 [Back to Tea Panel](../README.en-US.md)

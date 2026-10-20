@@ -1,6 +1,8 @@
 # Local data and migration
 
-Tea Panel uses macOS `UserDefaults` for settings. The app bundle identifier is `local.teapanel.app`. It has no account, cloud sync, analytics, or network client.
+Tea Panel stores preferences locally on each platform. It has no account, cloud sync, analytics, or network client. The platforms do not automatically import each other's data.
+
+The macOS app continues to use `UserDefaults` and bundle identifier `local.teapanel.app`. Its keys and migration backups below are unchanged.
 
 ## What is saved
 
@@ -32,3 +34,13 @@ The 0.3.3 preset update changes built-in defaults while preserving existing cust
 The backup entries contain the earlier JSON data rather than a separate exported file. Before attempting recovery, quit Tea Panel and make a copy of its preferences. A recovery tool must account for the source schema and migration markers; there is currently no recovery or import button in the app.
 
 The core tests cover migration, backup preservation, and relaunch behavior using isolated `UserDefaults` suites. Keep production settings out of tests, screenshots, and repository commits.
+
+## Windows preferences
+
+Windows uses `%LOCALAPPDATA%\TeaPanel\preferences.json`, outside the app's installation or extraction folder. Its schema starts at `schemaVersion: 1` and saves shared capacity and water volume, the selected tea/mode, up to 10 saved configurations, and the latest custom draft. Round identity, deadlines, reminders, and infusion counts stay in memory; restarting begins idle at infusion 1.
+
+JSON is serialized before writing a temporary file in the same directory and replacing the previous file. A save failure retains the previous file and current in-memory edit, with a visible message. Invalid numeric data cannot replace the last successfully saved file.
+
+An unreadable original is copied to `preferences.json.unreadable-<id>.bak` before defaults are used. If the copy fails, the original remains and further writes are blocked for that run. An unsupported schema is left intact and is also protected from writes. No historical macOS migration runs on Windows.
+
+Windows core tests use unique temporary directories. Desktop checks use `build/windows/verification/isolated-preferences/`, with a fresh in-memory store and an injected clock, never the normal Windows preference path. See the [Windows guide](windows-guide.md) and [verification record](windows-verification.zh-CN.md).

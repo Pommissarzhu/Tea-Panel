@@ -14,9 +14,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
+  macos:
     runs-on: macos-15
     timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.number }}
     defaults:
       run:
         shell: bash
@@ -60,29 +62,107 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Validate platform versions
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: |
+          [xml] $project = Get-Content windows/TeaPanel/TeaPanel.csproj -Raw -Encoding UTF8
+          $version = [string] $project.Project.PropertyGroup[0].Version
+          [xml] $plist = Get-Content Resources/Info.plist -Raw -Encoding UTF8
+          $macVersion = $plist.SelectSingleNode("//key[text()='CFBundleShortVersionString']/following-sibling::string[1]").InnerText
+          if ($version -ne $macVersion) { throw "Windows version $version must match macOS version $macVersion" }
+          if ($env:RELEASE_TAG -and $env:RELEASE_TAG -ne "v$version") { throw "Tag must match v$version" }
+          "number=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Run core regression checks
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File windows/test.ps1
+
+      - name: Build self-contained single Windows EXE
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
+
+      - name: Verify Windows artifact and checksum
+        env:
+          APP_VERSION: ${{ steps.version.outputs.number }}
+        run: |
+          $name = "Tea-Panel-$env:APP_VERSION-Windows-x64.exe"
+          $executable = Join-Path 'dist' $name
+          $checksum = "$executable.sha256"
+          $files = @(Get-ChildItem -LiteralPath dist -Force)
+          if ($files.Count -ne 2 -or -not (Test-Path -LiteralPath $executable -PathType Leaf) -or -not (Test-Path -LiteralPath $checksum -PathType Leaf)) {
+            throw 'Windows artifact must contain only the standalone EXE and its checksum'
+          }
+          $hash = (Get-FileHash -LiteralPath $executable -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ((Get-Content -LiteralPath $checksum -Raw).Trim() -ne "$hash  $name") {
+            throw 'Windows executable checksum does not match'
+          }
+          "Windows standalone executable: $name" >> $env:GITHUB_STEP_SUMMARY
+          "Size: $((Get-Item -LiteralPath $executable).Length) bytes" >> $env:GITHUB_STEP_SUMMARY
+          "SHA-256: $hash" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Save Windows artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Tea-Panel-${{ steps.version.outputs.number }}-Windows-x64
+          path: |
+            dist/Tea-Panel-${{ steps.version.outputs.number }}-Windows-x64.exe
+            dist/Tea-Panel-${{ steps.version.outputs.number }}-Windows-x64.exe.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: [macos, windows]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download platform packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: Tea-Panel-*
+          merge-multiple: true
+          path: dist
+
       - name: Publish GitHub Release
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
-          DMG_PATH: dist/Tea-Panel-${{ steps.version.outputs.number }}-Apple-Silicon.dmg
         run: |
           cat > "$RUNNER_TEMP/tea-panel-release-notes.md" <<'NOTES'
-          **macOS 13+ · Apple Silicon (arm64)**
+          **macOS 13+ · Apple Silicon / Windows 11 · x64**
 
-          下载 `.dmg`，打开后将 **茶伴** 拖入 **Applications**。
-          `.sha256` 文件可用于校验下载内容。
+          macOS：打开 `.dmg`，将 **茶伴** 拖入 **Applications**。
+          Windows：直接运行下载的 `.exe`；只需一个文件，已包含 .NET 运行时。
+          各平台的 `.sha256` 文件可用于校验下载内容。
 
-          当前安装包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。
-          首次打开时，macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。
+          macOS 包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。
+          Windows 包尚未进行代码签名。
 
-          Download the `.dmg`, open it, and drag **Tea Panel.app** into **Applications**.
-          Use the `.sha256` file to verify the download.
+          macOS: open the `.dmg` and drag **Tea Panel.app** into **Applications**.
+          Windows: run the downloaded `.exe`. This single file includes the .NET runtime.
+          Use the matching `.sha256` file to verify each download.
 
-          This build is signed ad hoc and is not Developer ID signed or notarized by Apple.
-          On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
+          The macOS build is signed ad hoc, without Developer ID signing or Apple notarization.
+          The Windows build is not code signed.
           NOTES
-          gh release create "$RELEASE_TAG" "$DMG_PATH" "$DMG_PATH.sha256" \
+          gh release create "$RELEASE_TAG" dist/* \
             --verify-tag --title "茶伴 / Tea Panel $RELEASE_TAG" \
             --notes-file "$RUNNER_TEMP/tea-panel-release-notes.md" --generate-notes

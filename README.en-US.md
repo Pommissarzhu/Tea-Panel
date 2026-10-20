@@ -4,20 +4,21 @@
 
 <h1 align="center">Tea Panel</h1>
 
-<p align="center">A quiet tea brewing companion for your Mac's menu bar.</p>
+<p align="center">A quiet native tea brewing companion for the Mac menu bar and Windows system tray.</p>
 
 <p align="center">
   <a href="README.md">简体中文</a> · <strong>English (US)</strong>
 </p>
 
-<p align="center">macOS 13+ · Apple Silicon · Swift 6 · MIT</p>
+<p align="center">macOS 13+ / Apple Silicon · Windows 11 / x64 · MIT</p>
 
 Tea Panel helps you brew a cup of tea while you work. Set your water volume, check the suggested amount of dry tea, and follow the cooling and steeping timers. When it's time to add leaves or remove your infuser, a silent floating card stays visible until you respond.
 
-The app is named **茶伴** on Simplified Chinese systems and **Tea Panel** in English. Its current interface and default README are in **Simplified Chinese**. This README uses American English; both versions describe the same app.
+On macOS, the app is named **茶伴** on Simplified Chinese systems and **Tea Panel** in English. The Windows window is named **茶伴 · Tea Panel**, and its executable is `TeaPanel.exe`. Both interfaces and the default README use **Simplified Chinese**. This README uses American English; both versions describe the same behavior.
 
 <p align="center">
-  <img src="docs/images/brewing-panel.png" width="384" alt="Tea Panel showing the gardenia green tea preset, 330 mL of water, and a suggested 6.6 g of dry tea">
+  <img src="docs/images/brewing-panel.png" width="384" alt="macOS Tea Panel showing gardenia green tea, 330 mL, and 6.6 g of dry tea">
+  <img src="docs/images/windows-brewing-panel.png" width="384" alt="Native Windows WPF panel showing gardenia green tea, 330 mL, and 6.6 g of dry tea">
 </p>
 
 ## Features
@@ -26,20 +27,26 @@ The app is named **茶伴** on Simplified Chinese systems and **Tea Panel** in E
 - **Tea amounts that match your cup:** calculate dry tea from your water volume and preferred ratio.
 - **Cooling and steeping stages:** confirm when you add the leaves, or skip cooling when you're ready to brew.
 - **Refill support:** reuse the same leaves, add time with each infusion, and start at any infusion from 1 to 99.
-- **Persistent, silent reminders:** see the countdown in the menu bar and act on a floating reminder when time is up.
+- **Persistent, silent reminders:** see the countdown in the Mac menu bar, or the Windows panel and tray tooltip. A floating reminder stays until you respond.
 - **Your own recipes:** save up to 10 configurations with custom names, icons, ratios, temperatures, and timing.
-- **Local preferences:** cup settings, saved recipes, and the latest draft stay on your Mac. The app makes no network requests.
-- **Native interface:** SwiftUI and AppKit, with Reduce Motion support and no third-party dependencies.
+- **Local preferences:** cup settings, saved recipes, and the latest draft stay on your computer. The app makes no network requests.
+- **Native interfaces:** SwiftUI/AppKit on macOS and C#/WPF/.NET 10 on Windows, with system animation preferences and no third-party application dependencies.
 
 ## Quick start
 
-### Download the app
+### Install on macOS
 
 Download `Tea-Panel-<version>-Apple-Silicon.dmg` from [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
 
 The current installer is signed ad hoc and is not Developer ID signed or notarized by Apple. On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
 
-### Build from source
+### Install on Windows
+
+The current Windows source version is **0.4.2** and has not been published to GitHub Releases yet. Build it below, or double-click the locally packaged `Tea-Panel-0.4.2-Windows-x64.exe`. Only this EXE is needed: it includes the .NET runtime and requires no extraction, separate .NET installation, or administrator privileges. The Windows package is not code signed.
+
+Click the tray icon to open the panel; its right-click menu provides Open and Quit. Closing the panel, pressing Esc, or switching apps hides the window while timers continue. Quitting from the tray ends the session. See the [Windows guide](docs/windows-guide.md).
+
+### Build for macOS
 
 - A Mac with **Apple Silicon** running **macOS 13 Ventura or later**.
 - Xcode Command Line Tools with a **Swift 6** compiler and the macOS SDK.
@@ -55,6 +62,16 @@ zsh build.sh --run
 The script builds and opens `build/Tea Panel.app`. You can also build with `zsh build.sh` and open the app yourself, or copy it to your Applications folder. The menu opens on launch; click its menu bar icon to open it again.
 
 The build script currently targets `arm64`. Local builds and GitHub Actions installers use ad hoc signing.
+
+### Build for Windows
+
+Use Windows 11 x64 and the .NET 10 SDK. A full Visual Studio installation is not required. From the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File windows/build.ps1 -Run
+```
+
+The app is created at `build/windows/app/TeaPanel.exe`. Scripts support Windows PowerShell 5.1 and PowerShell 7; `TEA_PANEL_DOTNET` can select a local `dotnet.exe`. Existing macOS code stays in `Sources/`, and Windows code lives in `windows/`.
 
 ## Brew your first cup
 
@@ -92,9 +109,23 @@ zsh test.sh --motion  # Also run window and menu bar checks; requires a macOS GU
 zsh package.sh        # Rebuild and create a DMG and SHA-256 checksum in dist/
 ```
 
-The current suites contain **193 core checks** and **68 motion and menu bar checks**. Full-screen behavior, multiple displays, and physical sleep/wake interactions still need hands-on verification. See [Contributing](CONTRIBUTING.md) for the source map and validation scope.
+The existing macOS verification record contains **193 core checks** and **68 motion and menu bar checks**. Full-screen behavior, multiple displays, and physical sleep/wake interactions still need hands-on verification. See [Contributing](CONTRIBUTING.md) for the source map and validation scope.
 
-Pushing a `v<version>` tag that matches the app version runs the core checks, builds the app, verifies its signature, packages a DMG, and publishes it to GitHub Releases. You can also run **Build and Release** manually from Actions to create downloadable build artifacts without publishing a release. See [Contributing](CONTRIBUTING.md#releases) for release steps.
+Windows commands:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File windows/test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File windows/test.ps1 -Desktop
+powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
+```
+
+Windows passed **92 core and preference checks** and **78 desktop checks**, with rendered inspection at 200% scaling. `-Desktop` needs a logged-in graphical session, uses isolated data, and briefly shows test windows. Physical sleep/wake, multiple displays, and other pending scenarios are listed in the [verification record](docs/windows-verification.zh-CN.md). The 193/68 macOS results above come from earlier verification; macOS tests were not rerun during this Windows implementation.
+
+Packaging creates `dist/Tea-Panel-0.4.2-Windows-x64.exe` and `.exe.sha256`; the checksum file is optional for running the app. Development builds still use the regular output under `build/windows/app/`.
+
+The release workflow is configured to test and package each platform separately, then use a single publishing job for the macOS DMG, single-file Windows EXE, and their SHA-256 checksums. Matching `v<version>` tags publish releases; manual **Build and Release** runs only save build artifacts. See [Contributing](CONTRIBUTING.md#releases) for release steps.
+
+After a manual build, download the Windows artifact from its Actions run. GitHub's website wraps artifacts in a ZIP containing just the standalone EXE and optional checksum; no DLLs are needed to run it. Use `gh run download` to retrieve the files directly. Release assets provide the EXE directly.
 
 ```text
 .
@@ -102,6 +133,7 @@ Pushing a `v<version>` tag that matches the app version runs the core checks, bu
 ├── Sources/          # SwiftUI views, AppKit integration, timer logic, and motion
 ├── Resources/        # App metadata and the active app icon
 ├── Tests/            # Core and window regression checks
+├── windows/          # WPF app, Windows regression checks, and PowerShell scripts
 ├── docs/             # Usage guides, screenshots, design notes, and verification records
 ├── build.sh          # Local app build
 ├── package.sh        # DMG packaging and verification
@@ -118,6 +150,9 @@ Generated apps, disk images, compiler caches, and local settings are excluded fr
 | [Changelog](CHANGELOG.md) | App version history |
 | [Contributing](CONTRIBUTING.md) | Building, testing, and making changes |
 | [Local data and migration](docs/data-storage.md) | Preferences and upgrade backups |
+| [Windows guide](docs/windows-guide.md) / [简体中文](docs/windows-guide.zh-CN.md) | Tray behavior, building, and packaging |
+| [Windows verification](docs/windows-verification.zh-CN.md) | Local results, screenshots, and pending scenarios |
+| [Windows implementation plan](docs/windows-native-plan.zh-CN.md) | Technical choices and platform organization, in Chinese |
 | [Product plan](docs/product-plan.zh-CN.md) | Original product decisions, in Chinese |
 | [Verification history](docs/verification.zh-CN.md) | Earlier local test and UI inspection records, in Chinese |
 | [Icon design](docs/design/app-icon.zh-CN.md) | Active icon provenance and a separate design proposal |

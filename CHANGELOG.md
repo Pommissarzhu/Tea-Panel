@@ -1,8 +1,23 @@
 # Changelog
 
-This history describes Tea Panel (茶伴) app versions. The current version is **0.3.9**.
+This history describes Tea Panel (茶伴) app versions. The source version is **0.4.2** (unreleased); the latest published version is **0.3.9**.
 
 ## Unreleased
+
+- Add a native Windows 11 x64 tray app built with C#, WPF, and .NET 10, alongside the existing macOS source tree.
+- Match the existing presets, dose rounding, staged timers, refill behavior, custom configurations, and persistent silent reminders on Windows.
+- Save Windows preferences locally with recoverable unreadable files; active brewing sessions end on exit.
+- Add PowerShell build/test/package commands, a self-contained single EXE with a checksum, 92 core/preference checks, and 78 native desktop checks.
+- Extend the release workflow with independent macOS and Windows builds and one shared publishing job.
+- Add Windows screenshots, usage notes, and a verification record. Preserve macOS source layout, application identity, and preference migrations.
+- Style Windows selectors with rounded paper cards, checked choices, slim scrollbars, and rounded keyboard focus rings.
+- Animate Windows selection highlights, button feedback, readout changes, settings pages, and dropdowns; keep countdown ticks direct and respect system animation preferences.
+- Align the Windows panel with the Mac layout: illustrated tea cards, compact saved menu, infusion badge, paired water/infusion cards, stage indicators, summary dividers, and fixed footer in a 384 × 668 content frame.
+- Match the Mac parameter flow with direct custom editing, quick save/update, separate minute/second menus, selected temperature shortcuts, and a styled slider; refine reminder spacing and symbol entrance.
+- Bundle the Windows runtime and native dependencies into one compressed executable; embed the MIT license and publish the EXE directly without ZIP extraction.
+- Use the same single-EXE packaging command in GitHub Actions, verify the uploaded files and checksum, and document manual artifact downloads versus direct Release EXE downloads.
+
+## 0.3.9
 
 - Add tag-triggered GitHub Actions builds that test, package, and publish an Apple Silicon DMG and SHA-256 checksum to GitHub Releases, plus manual artifact builds.
 - Add `package.sh` for local DMG packaging and document installation and release steps in both READMEs.
@@ -10,9 +25,6 @@ This history describes Tea Panel (茶伴) app versions. The current version is *
 - Organize usage guides, product notes, icon design proposals, and verification records under `docs/`.
 - Add contributing and preference migration documentation, an MIT license, and broader ignore rules for local output.
 - Keep local research material out of the published repository.
-
-## 0.3.9
-
 - Set the Simplified Chinese app name to 茶伴 in macOS, the main panel, menu bar tooltips, and accessibility labels; retain Tea Panel as the English name.
 - Preserve the bundle identifier, on-disk app bundle name, and preference keys so existing installations keep their saved recipes and settings.
 

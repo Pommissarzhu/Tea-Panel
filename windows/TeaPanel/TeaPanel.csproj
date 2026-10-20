@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- WPF owns process startup and uses the DPI manifest; WinForms supplies only NotifyIcon. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+    <Version>0.4.2</Version>
+    <AssemblyName>TeaPanel</AssemblyName>
+    <RootNamespace>TeaPanel</RootNamespace>
+    <ApplicationIcon>Assets/AppIcon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Product>茶伴 / Tea Panel</Product>
+    <Description>A quiet tea brewing companion for Windows.</Description>
+    <Copyright>Tea Panel · 2026</Copyright>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets/AppIcon.ico" />
+    <EmbeddedResource Include="../../LICENSE" LogicalName="TeaPanel.LICENSE.txt" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(TeaPanelTesting)' == 'true'">
+    <DefineConstants>$(DefineConstants);TEA_PANEL_TESTING</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TeaPanelTesting)' == 'true'">
+    <Compile Include="../Tests/DesktopChecks.cs" Link="DesktopChecks.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,349 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:TeaPanel">
+    <SolidColorBrush x:Key="Paper" Color="#F5F7ED" />
+    <SolidColorBrush x:Key="Forest" Color="#1F4538" />
+    <SolidColorBrush x:Key="Green" Color="#3D6E52" />
+    <SolidColorBrush x:Key="Muted" Color="#6E7D6E" />
+    <SolidColorBrush x:Key="Pale" Color="#E0EDCF" />
+    <SolidColorBrush x:Key="Line" Color="#D9E0CF" />
+    <SolidColorBrush x:Key="Error" Color="#AA4439" />
+    <SolidColorBrush x:Key="TranslucentWhite" Color="#B3FFFFFF" />
+    <FontFamily x:Key="TeaFont">Segoe UI Variable Text, Microsoft YaHei UI</FontFamily>
+    <FontFamily x:Key="TeaReadoutFont">Segoe UI Variable Display, Microsoft YaHei UI</FontFamily>
+    <CornerRadius x:Key="ToggleCorner">8</CornerRadius>
+
+    <Style x:Key="TeaFocusRing" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Border BorderBrush="{StaticResource Green}" BorderThickness="1.5" CornerRadius="12" Margin="-3" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource TeaFont}" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style x:Key="FieldCaption" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="FontSize" Value="10" />
+    </Style>
+    <Style x:Key="SettingsCard" TargetType="Border">
+        <Setter Property="Background" Value="#A6FFFFFF" />
+        <Setter Property="CornerRadius" Value="15" />
+        <Setter Property="Padding" Value="15" />
+    </Style>
+    <Style x:Key="NumberCard" TargetType="Border">
+        <Setter Property="Background" Value="#99FFFFFF" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="11.5" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="MinHeight" Value="70" />
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="BorderBrush" Value="#733D6E52" /></Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="Caption" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="#BFFFFFFF" />
+        <Setter Property="CornerRadius" Value="14" />
+        <Setter Property="Padding" Value="15" />
+    </Style>
+    <Style TargetType="Button">
+        <Setter Property="local:TeaMotion.Feedback" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource TeaFocusRing}" />
+        <Setter Property="Foreground" Value="{StaticResource Green}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Chrome" Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="13" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="Pill"><Setter TargetName="Chrome" Property="CornerRadius" Value="15" /></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Cursor" Value="Arrow" /></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="QuietButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource Green}" />
+        <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Background" Value="{StaticResource Forest}" />
+        <Setter Property="Foreground" Value="{StaticResource Paper}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Height" Value="45" />
+    </Style>
+    <Style TargetType="ToggleButton">
+        <Setter Property="local:TeaMotion.Feedback" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource TeaFocusRing}" />
+        <Setter Property="Foreground" Value="{StaticResource Green}" />
+        <Setter Property="Background" Value="#80E0EDCF" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Padding" Value="5,10" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <Border x:Name="Chrome" CornerRadius="{DynamicResource ToggleCorner}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" />
+                        <Border x:Name="SelectionFill" CornerRadius="{DynamicResource ToggleCorner}" Background="{StaticResource Forest}" Opacity="0" IsHitTestVisible="False" />
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True"><Setter Property="Foreground" Value="{StaticResource Paper}" /><Setter Property="FontWeight" Value="SemiBold" /><Setter TargetName="SelectionFill" Property="Opacity" Value="1" /></Trigger>
+                        <Trigger Property="Tag" Value="Stage"><Setter TargetName="Chrome" Property="CornerRadius" Value="11.5" /><Setter TargetName="SelectionFill" Property="CornerRadius" Value="11.5" /><Setter TargetName="SelectionFill" Property="Background" Value="{StaticResource Pale}" /><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{StaticResource Muted}" /></Trigger>
+                        <MultiTrigger><MultiTrigger.Conditions><Condition Property="Tag" Value="Stage" /><Condition Property="IsChecked" Value="True" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{StaticResource Forest}" /></MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Cursor" Value="Arrow" /></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="PresetButton" TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+        <Style.Resources><CornerRadius x:Key="ToggleCorner">15</CornerRadius></Style.Resources>
+        <Setter Property="Background" Value="#99FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="Padding" Value="5,12" />
+        <Setter Property="Margin" Value="0,0,7,0" />
+        <Setter Property="Height" Value="66" />
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+    <Style x:Key="TemperatureButton" TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+        <Style.Resources><CornerRadius x:Key="ToggleCorner">12</CornerRadius></Style.Resources>
+        <Setter Property="Background" Value="#99E0EDCF" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Padding" Value="0,5" />
+        <Setter Property="Margin" Value="0,0,5,0" />
+    </Style>
+    <Style TargetType="TextBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource TeaFocusRing}" />
+        <Setter Property="Foreground" Value="{StaticResource Forest}" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource Line}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,5" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Validation.ErrorTemplate"><Setter.Value><ControlTemplate><AdornedElementPlaceholder /></ControlTemplate></Setter.Value></Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Chrome" CornerRadius="9" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                        <ScrollViewer x:Name="PART_ContentHost" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Green}" /></Trigger>
+                        <Trigger Property="Validation.HasError" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Error}" /></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chrome" Property="Opacity" Value="0.5" /></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="NumberInput" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource Pale}" />
+        <Setter Property="CaretBrush" Value="{StaticResource Forest}" />
+    </Style>
+    <Style TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{StaticResource Forest}" />
+        <Setter Property="Background" Value="#BFFFFFFF" />
+        <Setter Property="BorderBrush" Value="{StaticResource Line}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="MinHeight" Value="35" />
+        <Setter Property="MaxDropDownHeight" Value="260" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid x:Name="SelectorRoot" SnapsToDevicePixels="True">
+                        <Border x:Name="Chrome" CornerRadius="11" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <Grid Margin="{TemplateBinding Padding}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="18" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="SelectionText" Text="{TemplateBinding Text}" TextTrimming="CharacterEllipsis" FontSize="{TemplateBinding FontSize}" FontWeight="{TemplateBinding FontWeight}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="Center" IsHitTestVisible="False" Margin="0,0,6,0" Foreground="{TemplateBinding Foreground}" />
+                                <Path x:Name="Chevron" Grid.Column="1" Data="M1,1 L5,5 L9,1" Stroke="{StaticResource Muted}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+                        <ToggleButton x:Name="DropDownToggle" Style="{x:Null}" Focusable="False" IsTabStop="False" ClickMode="Press" Background="Transparent"
+                            IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border Background="{TemplateBinding Background}" CornerRadius="11" /></ControlTemplate></ToggleButton.Template>
+                        </ToggleButton>
+                        <Popup x:Name="PART_Popup" Placement="Bottom" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" HorizontalOffset="-8" VerticalOffset="0"
+                            IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="None">
+                            <Border x:Name="PopupCard" Margin="8" Padding="6" CornerRadius="13" Background="{StaticResource Paper}" BorderBrush="{StaticResource Line}" BorderThickness="1"
+                                MinWidth="{TemplateBinding ActualWidth}" MaxWidth="360" MaxHeight="{TemplateBinding MaxDropDownHeight}" local:TeaMotion.PopupEntrance="True">
+                                <Border.Effect><DropShadowEffect BlurRadius="12" ShadowDepth="3" Opacity="0.16" /></Border.Effect>
+                                <ScrollViewer Style="{DynamicResource OverlayScrollViewer}" CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Green}" /></Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Green}" /></Trigger>
+                        <Trigger Property="IsDropDownOpen" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Green}" />
+                            <Setter TargetName="Chevron" Property="Data" Value="M1,5 L5,1 L9,5" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource Muted}" /><Setter TargetName="Chevron" Property="Opacity" Value="0.45" /></Trigger>
+                        <Trigger Property="Tag" Value="SavedMenu">
+                            <Setter Property="FocusVisualStyle" Value="{StaticResource TeaFocusRing}" />
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="Transparent" />
+                            <Setter TargetName="SelectionText" Property="Text" Value="{Binding CustomConfigurations.Length, StringFormat=已存 {0}/10}" />
+                            <Setter TargetName="SelectionText" Property="Foreground" Value="{StaticResource Green}" />
+                            <Setter TargetName="SelectionText" Property="FontSize" Value="11" />
+                            <Setter TargetName="SelectionText" Property="Margin" Value="0" />
+                            <Setter TargetName="SelectionText" Property="HorizontalAlignment" Value="Right" />
+                            <Setter TargetName="Chevron" Property="Stroke" Value="{StaticResource Green}" />
+                        </Trigger>
+                        <MultiTrigger><MultiTrigger.Conditions><Condition Property="Tag" Value="SavedMenu" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="Chrome" Property="BorderBrush" Value="#663D6E52" /></MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="TimeSelector" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Background" Value="#E6FFFFFF" />
+        <Setter Property="BorderThickness" Value="0.7" />
+        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="Height" Value="34" />
+        <Setter Property="MinHeight" Value="34" />
+    </Style>
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource Forest}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="8,8" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="ItemChrome" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="0,1">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="20" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                            <Path x:Name="Check" Data="M1,5 L4,8 L10,1" Stroke="{StaticResource Green}" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" VerticalAlignment="Center" Opacity="0" />
+                            <ContentPresenter Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemChrome" Property="Background" Value="#EAF0DF" /></Trigger>
+                        <Trigger Property="IsSelected" Value="True"><Setter TargetName="Check" Property="Opacity" Value="1" /><Setter TargetName="ItemChrome" Property="Background" Value="{StaticResource Pale}" /><Setter Property="FontWeight" Value="SemiBold" /></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource Muted}" /></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="ScrollBar">
+        <Setter Property="Width" Value="9" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Width="5" HorizontalAlignment="Center" Margin="2,4" Background="Transparent">
+                        <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True"
+                            Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" ViewportSize="{TemplateBinding ViewportSize}"
+                            Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Focusable="False">
+                                    <RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb MinHeight="24" Background="{StaticResource Line}">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border x:Name="ThumbBody" Background="{TemplateBinding Background}" CornerRadius="3" />
+                                            <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ThumbBody" Property="Background" Value="{StaticResource Muted}" /></Trigger></ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Focusable="False">
+                                    <RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="OverlayScrollViewer" TargetType="ScrollViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid ClipToBounds="True">
+                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                            CanContentScroll="{TemplateBinding CanContentScroll}" Margin="{TemplateBinding Padding}" />
+                        <ScrollBar x:Name="PART_VerticalScrollBar" Width="6" HorizontalAlignment="Right" Margin="0,8,4,8" Orientation="Vertical"
+                            Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}" Value="{Binding VerticalOffset, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
+                            Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Opacity="0" IsHitTestVisible="False" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="PART_VerticalScrollBar" Property="Opacity" Value="0.8" /><Setter TargetName="PART_VerticalScrollBar" Property="IsHitTestVisible" Value="True" /></Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="PART_VerticalScrollBar" Property="Opacity" Value="0.8" /><Setter TargetName="PART_VerticalScrollBar" Property="IsHitTestVisible" Value="True" /></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="Slider">
+        <Setter Property="MinHeight" Value="18" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Track x:Name="PART_Track" Orientation="Horizontal" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                        IsDirectionReversed="{TemplateBinding IsDirectionReversed}" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                        <Track.DecreaseRepeatButton><RepeatButton Command="{x:Static Slider.DecreaseLarge}" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Height="3" Background="{StaticResource Green}" CornerRadius="2" /></ControlTemplate></RepeatButton.Template></RepeatButton></Track.DecreaseRepeatButton>
+                        <Track.Thumb><Thumb Width="14" Height="14"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="White" BorderBrush="#803D6E52" BorderThickness="0.7" CornerRadius="7"><Border.Effect><DropShadowEffect BlurRadius="3" ShadowDepth="1" Opacity="0.15" /></Border.Effect></Border></ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+                        <Track.IncreaseRepeatButton><RepeatButton Command="{x:Static Slider.IncreaseLarge}" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Height="3" Background="{StaticResource Pale}" CornerRadius="2" /></ControlTemplate></RepeatButton.Template></RepeatButton></Track.IncreaseRepeatButton>
+                    </Track>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
