@@ -119,7 +119,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File windows/test.ps1 -Desktop
 powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
 ```
 
-Windows passed **92 core and preference checks** and **78 desktop checks**, with rendered inspection at 200% scaling. `-Desktop` needs a logged-in graphical session, uses isolated data, and briefly shows test windows. Physical sleep/wake, multiple displays, and other pending scenarios are listed in the [verification record](docs/windows-verification.zh-CN.md). The 193/68 macOS results above come from earlier verification; macOS tests were not rerun during this Windows implementation.
+Windows passed **92 core and preference checks** and **78 desktop checks**, with rendered inspection at 200% scaling. `-Desktop` needs a logged-in graphical session, uses isolated data, and briefly shows test windows. Physical sleep/wake, multiple displays, and other pending scenarios are listed in the [verification record](docs/windows-verification.zh-CN.md). The [dual-platform Actions build on October 20, 2026](https://github.com/Pommissarzhu/Tea-Panel/actions/runs/39358215202) reran and passed 193 macOS and 92 Windows core checks, producing the DMG and standalone EXE. The 68 macOS motion checks remain an earlier local result.
 
 Packaging creates `dist/Tea-Panel-0.4.2-Windows-x64.exe` and `.exe.sha256`; the checksum file is optional for running the app. Development builds still use the regular output under `build/windows/app/`.
 

@@ -2,7 +2,7 @@
 
 日期：2026-10-19
 
-状态：Windows 首版与交互动效修订已实现，本地构建、核心与隔离桌面检查、自包含打包通过；远端双平台构建结果见 [Actions](https://github.com/Pommissarzhu/Tea-Panel/actions/workflows/release.yml)，扩展实机场景仍待验证。详情见[Windows 验证记录](windows-verification.zh-CN.md)。
+状态：Windows 首版与交互动效修订已实现，本地构建、核心与隔离桌面检查、自包含打包通过；2026-10-20 的[远端双平台构建](https://github.com/Pommissarzhu/Tea-Panel/actions/runs/39358215202)也已通过，扩展实机场景仍待验证。详情见[Windows 验证记录](windows-verification.zh-CN.md)。
 
 功能基线：macOS 版 0.3.9，提交 `0d3df5c`。
 

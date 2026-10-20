@@ -119,7 +119,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File windows/test.ps1 -Desktop
 powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
 ```
 
-Windows 已通过 **92 项核心与存储检查**、**78 项桌面检查**，并在 200% 缩放下渲染验收。`-Desktop` 需要登录的图形桌面，使用隔离数据并短暂显示测试窗口；真实休眠、多显示器等仍见[验证记录](docs/windows-verification.zh-CN.md)。上面的 193/68 项是 macOS 既有验收记录，本次 Windows 开发未重新运行 macOS 测试。
+Windows 已通过 **92 项核心与存储检查**、**78 项桌面检查**，并在 200% 缩放下渲染验收。`-Desktop` 需要登录的图形桌面，使用隔离数据并短暂显示测试窗口；真实休眠、多显示器等仍见[验证记录](docs/windows-verification.zh-CN.md)。2026-10-20 的[双平台 Actions 构建](https://github.com/Pommissarzhu/Tea-Panel/actions/runs/39358215202)重新通过 macOS 的 193 项和 Windows 的 92 项核心检查，并生成 DMG 和单文件 EXE；68 项 macOS 动效检查仍是此前的本地记录。
 
 打包命令生成 `dist/Tea-Panel-0.4.2-Windows-x64.exe` 和 `.exe.sha256`；校验文件不影响运行。开发用的 `build/windows/app/` 仍保留普通构建输出。
 

@@ -85,6 +85,15 @@ dcd70a09a39953ed1c0cc4ff1138757318ec26bfe50758b9c0c3ce4977ec25ba
 
 ![参数页分秒设置](images/windows-settings-timing.png)
 
+## 2026-10-20 Actions 实测
+
+使用 `gh workflow run release.yml --ref main` 触发[运行 39358215202](https://github.com/Pommissarzhu/Tea-Panel/actions/runs/39358215202)，对应源码提交 `eedd23685a57b4995fa031b31b8d31474a7cb440`。
+
+- `macos` 任务通过 193 项核心检查，构建并上传 Apple Silicon DMG 和校验文件。
+- `windows` 任务通过 92 项核心与存储检查，调用相同的 `windows/package.ps1` 生成自包含单文件 EXE，产物文件与 SHA-256 校验通过。
+- 两端 artifact 均上传成功。此次为手动运行，`publish` 按配置跳过，未创建 Release。
+- 桌面、动效、物理休眠与多显示器验收范围保持上文记录，不将核心 CI 视为图形交互检查。
+
 ## 待验证的场景
 
 - 物理鼠标点击托盘及其折叠菜单，快速反复开合。

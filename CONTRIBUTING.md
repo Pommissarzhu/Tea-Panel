@@ -88,7 +88,7 @@ The deployment target is macOS 13; this run does not establish behavior on every
 
 Earlier manual checks and native rendering probes are documented in the [verification history](docs/verification.zh-CN.md).
 
-The Windows implementation passed 92 core/storage checks and 78 native desktop checks on October 19, 2026, using .NET SDK 10.0.402 and runtime 10.0.13 on Windows build 26300 at 200% scaling. The Windows build had no warnings or errors. See the [Windows verification record](docs/windows-verification.zh-CN.md) for artifacts and remaining manual scenarios. The macOS results above are historical; this Windows session did not rerun them.
+The Windows implementation passed 92 core/storage checks and 78 native desktop checks on October 19, 2026, using .NET SDK 10.0.402 and runtime 10.0.13 on Windows build 26300 at 200% scaling. The Windows build had no warnings or errors. The [Actions run on October 20, 2026](https://github.com/Pommissarzhu/Tea-Panel/actions/runs/39358215202) passed both platform jobs, including 193 macOS and 92 Windows core checks, DMG packaging, and Windows single-EXE packaging and checksum verification. Desktop and motion checks remain local results. See the [Windows verification record](docs/windows-verification.zh-CN.md) for artifacts and remaining manual scenarios.
 
 ## Releases
 
