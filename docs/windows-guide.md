@@ -8,7 +8,7 @@ The panel follows the Mac app's 384 × 668 logical content size, illustrated tea
 
 ## Launch and tray behavior
 
-Double-click `Tea-Panel-0.4.2-Windows-x64.exe`. Only this EXE is needed: the .NET runtime is included, with no extraction, separate .NET installation, or adjacent DLLs required. This source version has not been published to GitHub Releases yet.
+Download `Tea-Panel-0.4.2-Windows-x64.exe` from the [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) and double-click it. Only this EXE is needed: the .NET runtime is included, with no extraction, separate .NET installation, or adjacent DLLs required. The same Release also provides the macOS DMG and checksums for both platforms.
 
 When updating, quit the old version from the tray before running the new EXE. Existing local settings are retained.
 

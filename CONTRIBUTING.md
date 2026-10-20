@@ -120,7 +120,7 @@ Replace `RUN_ID` with that run's numeric ID. The downloaded directory contains o
 
 4. Check the workflow in Actions and the assets in Releases. A failed check or build prevents release creation. An existing release is not overwritten; use a new version for subsequent releases.
 
-The workflow uses GitHub's automatic `GITHUB_TOKEN`; no personal access token or Apple signing secret is required. Existing releases are not overwritten. Windows 0.4.2 has not been published yet.
+The workflow uses GitHub's automatic `GITHUB_TOKEN`; no personal access token or Apple signing secret is required. Existing releases are not overwritten. The [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) provides both the Windows standalone EXE and the Apple Silicon DMG, each with a checksum.
 
 To verify a downloaded installer, keep the DMG and checksum in the same directory and run:
 

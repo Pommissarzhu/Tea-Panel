@@ -1,8 +1,8 @@
 # Changelog
 
-This history describes Tea Panel (茶伴) app versions. The source version is **0.4.2** (unreleased); the latest published version is **0.3.9**.
+This history describes Tea Panel (茶伴) app versions. The current source and latest release version are **0.4.2**.
 
-## Unreleased
+## 0.4.2
 
 - Add a native Windows 11 x64 tray app built with C#, WPF, and .NET 10, alongside the existing macOS source tree.
 - Match the existing presets, dose rounding, staged timers, refill behavior, custom configurations, and persistent silent reminders on Windows.

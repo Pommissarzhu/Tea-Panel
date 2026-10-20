@@ -1,6 +1,6 @@
 # Windows 验证与 Mac 界面对照
 
-本地验证日期：2026-10-19。Actions 配置与文档更新日期：2026-10-20。源码版本 0.4.2，Windows 发布包尚未上传到 GitHub Releases。
+本地验证日期：2026-10-19。Actions 配置与文档更新日期：2026-10-20。源码与发布版本为 0.4.2；[Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 提供 Windows 单文件 EXE、Mac DMG 和各自的 SHA-256。
 
 ## 环境
 

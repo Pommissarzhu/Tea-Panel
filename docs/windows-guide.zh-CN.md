@@ -8,7 +8,7 @@ Windows 版为 C# / WPF 原生托盘应用，首版面向 Windows 11 x64。配�
 
 ## 启动与托盘
 
-双击 `Tea-Panel-0.4.2-Windows-x64.exe`。只需一个 EXE，已包含 .NET 运行时，不用解压或另装 .NET，也不需要旁边放 DLL。当前源码版本尚未发布到 GitHub Releases。
+从 [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 下载并双击 `Tea-Panel-0.4.2-Windows-x64.exe`。只需一个 EXE，已包含 .NET 运行时，不用解压或另装 .NET，也不需要旁边放 DLL。同一个 Release 也提供 macOS 的 DMG 和两端的校验文件。
 
 更新时先从托盘退出旧版，再运行新 EXE。本地设置沿用原来的文件。
 

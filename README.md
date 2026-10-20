@@ -36,13 +36,13 @@ macOS 应用在简体中文系统中显示为**茶伴**，英文名为 **Tea Pan
 
 ### macOS 安装
 
-从 [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases) 下载 `Tea-Panel-<版本号>-Apple-Silicon.dmg`。打开磁盘映像，将**茶伴**拖入 **Applications**，再从“应用程序”启动。安装包不需要 Xcode 或 Command Line Tools。
+从 [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 下载 `Tea-Panel-0.4.2-Apple-Silicon.dmg`。打开磁盘映像，将**茶伴**拖入 **Applications**，再从“应用程序”启动。安装包不需要 Xcode 或 Command Line Tools。
 
 当前安装包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。首次打开时，macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。
 
 ### Windows 安装
 
-当前 Windows 源码为 **0.4.2**，尚未发布到 GitHub Releases。可按下文构建，或直接双击本地打包生成的 `Tea-Panel-0.4.2-Windows-x64.exe`。只需这一个 EXE，已包含 .NET 运行时，不需要解压、另装 .NET 或管理员权限。当前 Windows 包未进行代码签名。
+从 [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 下载 `Tea-Panel-0.4.2-Windows-x64.exe`，双击运行。只需这一个 EXE，已包含 .NET 运行时，不需要解压、另装 .NET 或管理员权限。当前 Windows 包未进行代码签名。
 
 启动后点击托盘图标打开主面板；右键菜单提供打开和退出。关闭面板、Esc 或失焦只隐藏窗口，计时继续；从托盘退出才结束本轮。Windows 详细说明见[使用与构建指南](docs/windows-guide.zh-CN.md)。
 

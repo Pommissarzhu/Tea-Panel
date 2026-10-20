@@ -36,13 +36,13 @@ On macOS, the app is named **茶伴** on Simplified Chinese systems and **Tea Pa
 
 ### Install on macOS
 
-Download `Tea-Panel-<version>-Apple-Silicon.dmg` from [GitHub Releases](https://github.com/Pommissarzhu/Tea-Panel/releases). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
+Download `Tea-Panel-0.4.2-Apple-Silicon.dmg` from the [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
 
 The current installer is signed ad hoc and is not Developer ID signed or notarized by Apple. On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
 
 ### Install on Windows
 
-The current Windows source version is **0.4.2** and has not been published to GitHub Releases yet. Build it below, or double-click the locally packaged `Tea-Panel-0.4.2-Windows-x64.exe`. Only this EXE is needed: it includes the .NET runtime and requires no extraction, separate .NET installation, or administrator privileges. The Windows package is not code signed.
+Download `Tea-Panel-0.4.2-Windows-x64.exe` from the [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) and double-click it. Only this EXE is needed: it includes the .NET runtime and requires no extraction, separate .NET installation, or administrator privileges. The Windows package is not code signed.
 
 Click the tray icon to open the panel; its right-click menu provides Open and Quit. Closing the panel, pressing Esc, or switching apps hides the window while timers continue. Quitting from the tray ends the session. See the [Windows guide](docs/windows-guide.md).
 

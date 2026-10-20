@@ -6,7 +6,7 @@
 
 功能基线：macOS 版 0.3.9，提交 `0d3df5c`。
 
-当前源码版本：两端均为 0.4.2，尚未发布。Windows 本地完成 92 项核心与存储检查、78 项桌面检查；按后续要求改为交付 `dist/Tea-Panel-0.4.2-Windows-x64.exe` 及校验文件。
+当前源码与发布版本：两端均为 0.4.2，[同一个 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 提供 Windows 单文件 EXE、Mac DMG 和校验文件。Windows 本地完成 92 项核心与存储检查、78 项桌面检查；按后续要求改为交付 `dist/Tea-Panel-0.4.2-Windows-x64.exe` 及校验文件。
 
 目标是在现有仓库内增加一个 **C# + WPF 的 Windows 原生托盘应用**，延续茶伴的泡茶流程、配方和视觉风格。macOS 继续使用 SwiftUI/AppKit；两端各自实现界面和系统集成，保持相同的产品规则。
 
