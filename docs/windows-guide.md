@@ -8,7 +8,7 @@ The panel follows the Mac app's 384 × 668 logical content size, illustrated tea
 
 ## Launch and tray behavior
 
-Download `Tea-Panel-0.4.2-Windows-x64.exe` from the [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) and double-click it. Only this EXE is needed: the .NET runtime is included, with no extraction, separate .NET installation, or adjacent DLLs required. The same Release also provides the macOS DMG and checksums for both platforms.
+Download `Tea-Panel-0.4.3-Windows-x64.exe` from the [v0.4.3 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.3) and double-click it. Only this EXE is needed: the .NET runtime is included, with no extraction, separate .NET installation, or adjacent DLLs required. The same Release also provides the macOS DMG and checksums for both platforms.
 
 When updating, quit the old version from the tray before running the new EXE. Existing local settings are retained.
 
@@ -73,7 +73,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
 
 The default suite checks core behavior and storage. `-Desktop` adds real WPF window checks using isolated data and an injected clock. Reports and screenshots go to `build/windows/verification/`; tests preserve the user's real Tea Panel settings and system animation setting.
 
-Packaging creates `dist/Tea-Panel-0.4.2-Windows-x64.exe` and `.exe.sha256`; the checksum file is optional for running the app. Beyond the app there is one lightweight core test project, with no database, background service, or third-party application package.
+Packaging creates `dist/Tea-Panel-0.4.3-Windows-x64.exe` and `.exe.sha256`; the checksum file is optional for running the app. Beyond the app there is one lightweight core test project, with no database, background service, or third-party application package.
 
 ## GitHub Actions builds
 

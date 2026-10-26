@@ -104,28 +104,28 @@ gh run list --workflow release.yml --event workflow_dispatch --limit 5
 After choosing the completed run ID, download its Windows files:
 
 ```sh
-gh run download RUN_ID --name Tea-Panel-0.4.2-Windows-x64 --dir build/actions-windows
+gh run download RUN_ID --name Tea-Panel-0.4.3-Windows-x64 --dir build/actions-windows
 ```
 
-Replace `RUN_ID` with that run's numeric ID. The downloaded directory contains only `Tea-Panel-0.4.2-Windows-x64.exe` and `.exe.sha256`. The GitHub website wraps an Actions artifact in a ZIP for download; that wrapper is separate from application packaging. `gh run download` extracts it automatically. Tag-triggered Release assets expose the EXE and checksum as separate downloads.
+Replace `RUN_ID` with that run's numeric ID. The downloaded directory contains only `Tea-Panel-0.4.3-Windows-x64.exe` and `.exe.sha256`. The GitHub website wraps an Actions artifact in a ZIP for download; that wrapper is separate from application packaging. `gh run download` extracts it automatically. Tag-triggered Release assets expose the EXE and checksum as separate downloads.
 
 1. Keep `CFBundleShortVersionString` in `Resources/Info.plist` and `Version` in `windows/TeaPanel/TeaPanel.csproj` identical; update the macOS build number and `CHANGELOG.md`. The workflow checks both versions against the tag.
 2. On their respective platforms, run `zsh test.sh`, `zsh package.sh`, and the Windows test/package commands above. Both packages contain the MIT license. Run interactive desktop checks locally for UI changes.
-3. Commit and push the release source, then the matching tag. For source version `0.4.2`:
+3. Commit and push the release source, then the matching tag. For source version `0.4.3`:
 
    ```sh
-   git tag v0.4.2
-   git push origin v0.4.2
+   git tag v0.4.3
+   git push origin v0.4.3
    ```
 
 4. Check the workflow in Actions and the assets in Releases. A failed check or build prevents release creation. An existing release is not overwritten; use a new version for subsequent releases.
 
-The workflow uses GitHub's automatic `GITHUB_TOKEN`; no personal access token or Apple signing secret is required. Existing releases are not overwritten. The [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) provides both the Windows standalone EXE and the Apple Silicon DMG, each with a checksum.
+The workflow uses GitHub's automatic `GITHUB_TOKEN`; no personal access token or Apple signing secret is required. Existing releases are not overwritten. The [v0.4.3 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.3) provides both the Windows standalone EXE and the Apple Silicon DMG, each with a checksum.
 
 To verify a downloaded installer, keep the DMG and checksum in the same directory and run:
 
 ```sh
-shasum -a 256 -c Tea-Panel-0.4.2-Apple-Silicon.dmg.sha256
+shasum -a 256 -c Tea-Panel-0.4.3-Apple-Silicon.dmg.sha256
 ```
 
 For Windows, compare `Get-FileHash -Algorithm SHA256` against the matching `.exe.sha256` file. The single EXE includes the runtime, native WPF libraries, and embedded MIT license; no adjacent DLLs are needed. The Mac app remains ad hoc signed; the Windows executable is unsigned. CI runs core suites; motion and interactive checks remain local verification steps.

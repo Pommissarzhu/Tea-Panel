@@ -37,13 +37,13 @@ macOS 应用在简体中文系统中显示为**茶伴**，英文名为 **Tea Pan
 
 ### macOS 安装
 
-从 [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 下载 `Tea-Panel-0.4.2-Apple-Silicon.dmg`。打开磁盘映像，将**茶伴**拖入 **Applications**，再从“应用程序”启动。安装包不需要 Xcode 或 Command Line Tools。
+从 [v0.4.3 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.3) 下载 `Tea-Panel-0.4.3-Apple-Silicon.dmg`。打开磁盘映像，将**茶伴**拖入 **Applications**，再从“应用程序”启动。安装包不需要 Xcode 或 Command Line Tools。
 
 当前安装包使用临时签名（ad hoc），尚未进行 Developer ID 签名和 Apple 公证。首次打开时，macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。
 
 ### Windows 安装
 
-从 [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 下载 `Tea-Panel-0.4.2-Windows-x64.exe`，双击运行。只需这一个 EXE，已包含 .NET 运行时，不需要解压、另装 .NET 或管理员权限。当前 Windows 包未进行代码签名。
+从 [v0.4.3 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.3) 下载 `Tea-Panel-0.4.3-Windows-x64.exe`，双击运行。只需这一个 EXE，已包含 .NET 运行时，不需要解压、另装 .NET 或管理员权限。当前 Windows 包未进行代码签名。
 
 启动后点击托盘图标打开主面板；右键菜单提供打开和退出。关闭面板、Esc 或失焦只隐藏窗口，计时继续；从托盘退出才结束本轮。Windows 详细说明见[使用与构建指南](docs/windows-guide.zh-CN.md)。
 
@@ -122,7 +122,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
 
 Windows 已通过 **92 项核心与存储检查**、**78 项桌面检查**，并在 200% 缩放下渲染验收。`-Desktop` 需要登录的图形桌面，使用隔离数据并短暂显示测试窗口；真实休眠、多显示器等仍见[验证记录](docs/windows-verification.zh-CN.md)。2026-10-20 的[双平台 Actions 构建](https://github.com/Pommissarzhu/Tea-Panel/actions/runs/39358215202)重新通过 macOS 的 193 项和 Windows 的 92 项核心检查，并生成 DMG 和单文件 EXE；68 项 macOS 动效检查仍是此前的本地记录。
 
-打包命令生成 `dist/Tea-Panel-0.4.2-Windows-x64.exe` 和 `.exe.sha256`；校验文件不影响运行。开发用的 `build/windows/app/` 仍保留普通构建输出。
+打包命令生成 `dist/Tea-Panel-0.4.3-Windows-x64.exe` 和 `.exe.sha256`；校验文件不影响运行。开发用的 `build/windows/app/` 仍保留普通构建输出。
 
 发布工作流已配置为两端分别检查、构建和打包，再由单个发布任务提供 macOS DMG、Windows 单文件 EXE 和各自 SHA-256。版本号与 `v<版本号>` 标签一致时发布；手动运行 **Build and Release** 只保留构建产物。发布步骤见[贡献指南](CONTRIBUTING.md#releases)。
 

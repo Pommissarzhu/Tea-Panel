@@ -37,13 +37,13 @@ On macOS, the app is named **茶伴** on Simplified Chinese systems and **Tea Pa
 
 ### Install on macOS
 
-Download `Tea-Panel-0.4.2-Apple-Silicon.dmg` from the [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
+Download `Tea-Panel-0.4.3-Apple-Silicon.dmg` from the [v0.4.3 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.3). Open the disk image, drag **Tea Panel.app** into **Applications**, and launch it from there. The installer does not require Xcode or Command Line Tools.
 
 The current installer is signed ad hoc and is not Developer ID signed or notarized by Apple. On first launch, macOS may require allowing the app in **System Settings → Privacy & Security**.
 
 ### Install on Windows
 
-Download `Tea-Panel-0.4.2-Windows-x64.exe` from the [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) and double-click it. Only this EXE is needed: it includes the .NET runtime and requires no extraction, separate .NET installation, or administrator privileges. The Windows package is not code signed.
+Download `Tea-Panel-0.4.3-Windows-x64.exe` from the [v0.4.3 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.3) and double-click it. Only this EXE is needed: it includes the .NET runtime and requires no extraction, separate .NET installation, or administrator privileges. The Windows package is not code signed.
 
 Click the tray icon to open the panel; its right-click menu provides Open and Quit. Closing the panel, pressing Esc, or switching apps hides the window while timers continue. Quitting from the tray ends the session. See the [Windows guide](docs/windows-guide.md).
 
@@ -122,7 +122,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
 
 Windows passed **92 core and preference checks** and **78 desktop checks**, with rendered inspection at 200% scaling. `-Desktop` needs a logged-in graphical session, uses isolated data, and briefly shows test windows. Physical sleep/wake, multiple displays, and other pending scenarios are listed in the [verification record](docs/windows-verification.zh-CN.md). The [dual-platform Actions build on October 20, 2026](https://github.com/Pommissarzhu/Tea-Panel/actions/runs/39358215202) reran and passed 193 macOS and 92 Windows core checks, producing the DMG and standalone EXE. The 68 macOS motion checks remain an earlier local result.
 
-Packaging creates `dist/Tea-Panel-0.4.2-Windows-x64.exe` and `.exe.sha256`; the checksum file is optional for running the app. Development builds still use the regular output under `build/windows/app/`.
+Packaging creates `dist/Tea-Panel-0.4.3-Windows-x64.exe` and `.exe.sha256`; the checksum file is optional for running the app. Development builds still use the regular output under `build/windows/app/`.
 
 The release workflow is configured to test and package each platform separately, then use a single publishing job for the macOS DMG, single-file Windows EXE, and their SHA-256 checksums. Matching `v<version>` tags publish releases; manual **Build and Release** runs only save build artifacts. See [Contributing](CONTRIBUTING.md#releases) for release steps.
 

@@ -8,7 +8,7 @@ Windows 版为 C# / WPF 原生托盘应用，首版面向 Windows 11 x64。配�
 
 ## 启动与托盘
 
-从 [v0.4.2 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.2) 下载并双击 `Tea-Panel-0.4.2-Windows-x64.exe`。只需一个 EXE，已包含 .NET 运行时，不用解压或另装 .NET，也不需要旁边放 DLL。同一个 Release 也提供 macOS 的 DMG 和两端的校验文件。
+从 [v0.4.3 Release](https://github.com/Pommissarzhu/Tea-Panel/releases/tag/v0.4.3) 下载并双击 `Tea-Panel-0.4.3-Windows-x64.exe`。只需一个 EXE，已包含 .NET 运行时，不用解压或另装 .NET，也不需要旁边放 DLL。同一个 Release 也提供 macOS 的 DMG 和两端的校验文件。
 
 更新时先从托盘退出旧版，再运行新 EXE。本地设置沿用原来的文件。
 
@@ -73,7 +73,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File windows/package.ps1
 
 普通测试覆盖核心和存储；`-Desktop` 另运行真实 WPF 窗口检查，使用隔离数据和注入时钟，结果与截图位于 `build/windows/verification/`。测试不会修改用户真实茶伴设置或系统动画开关。
 
-打包生成 `dist/Tea-Panel-0.4.2-Windows-x64.exe` 和 `.exe.sha256`；校验文件不影响运行。应用项目之外只有一个轻量核心测试项目，不引入数据库、后台服务或第三方应用包。
+打包生成 `dist/Tea-Panel-0.4.3-Windows-x64.exe` 和 `.exe.sha256`；校验文件不影响运行。应用项目之外只有一个轻量核心测试项目，不引入数据库、后台服务或第三方应用包。
 
 ## GitHub Actions 构建
 

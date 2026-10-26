@@ -8,7 +8,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <!-- WPF owns process startup and uses the DPI manifest; WinForms supplies only NotifyIcon. -->
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
-    <Version>0.4.2</Version>
+    <Version>0.4.3</Version>
     <AssemblyName>TeaPanel</AssemblyName>
     <RootNamespace>TeaPanel</RootNamespace>
     <ApplicationIcon>Assets/AppIcon.ico</ApplicationIcon>
