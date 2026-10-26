@@ -74,7 +74,7 @@ internal static class DesktopChecks
             Check(menu.IsVisible && host.IsMenuPresented, "Menu opens through the tray controller");
             Check(menu.PanelBody.Opacity > 0.99, "Menu entrance reaches full opacity");
             Check(!menu.WaterInput.IsKeyboardFocused && FocusManager.GetFocusedElement(menu) == menu.PanelBody, "Opening menu does not focus numeric input");
-            Check(menu.HeroValue.Text == "6.6", "Default dose renders in the WPF readout");
+            Check(menu.HeroValue.Text == "2.0", "Default dose renders in the WPF readout");
             Capture(menu, Path.Combine(outputDirectory, "windows-brewing-panel.png"));
             Check(HasInk(menu.HeroValue), "Readout font produces visible glyph pixels");
             Check(!menu.ShowInTaskbar && menu.Topmost, "Menu remains a floating tray panel");
@@ -196,12 +196,12 @@ internal static class DesktopChecks
             Click(menu.InfusionPlus);
             menu.UpdateLayout();
             await Task.Delay(250);
-            Check(store.StartingInfusion == 2 && menu.HeroValue.Text == "03:30", "Infusion selector switches dose to next infusion duration");
+            Check(store.StartingInfusion == 2 && menu.HeroValue.Text == "02:30", "Infusion selector switches dose to next infusion duration");
             Check(Math.Abs(menu.HeroRingIcon.TranslatePoint(new Point(), menu.PanelBody).X - ringX) < 0.01, "Readout switch keeps progress ring stationary");
             Click(menu.InfusionPlus);
             Click(menu.InfusionPlus);
             Check(await ObserveMotion(menu, menu.HeroValue, outputDirectory, "infusion-change", motionFrames)
-                && menu.HeroValue.Text == "04:30" && menu.HeroPrevious.Opacity < 0.01,
+                && menu.HeroValue.Text == "03:30" && menu.HeroPrevious.Opacity < 0.01,
                 "Rapid infusion changes animate and settle on the latest value");
             Click(menu.InfusionMinus);
             Click(menu.InfusionMinus);
@@ -245,7 +245,7 @@ internal static class DesktopChecks
             host.HoldMenuForLayoutChecks = true;
             var foreground = ReadFocus();
             Check(foreground.Foreground != IntPtr.Zero, "Operating-system foreground and keyboard focus snapshot is available");
-            now = now.AddSeconds(180);
+            now = now.AddSeconds(120);
             store.Tick();
             Check(ReadFocus() == foreground, "Reminder appearance preserves operating-system foreground and keyboard focus");
             await Task.Delay(450);
@@ -265,7 +265,7 @@ internal static class DesktopChecks
             await Task.Delay(220);
             Click(host.Reminder.ConfirmButton);
             await Task.Delay(280);
-            Check(store.Phase == TeaPhase.Brewing && store.RemainingSeconds == 180 && !host.Reminder.IsVisible, "Reminder confirmation starts full steeping timer");
+            Check(store.Phase == TeaPhase.Brewing && store.RemainingSeconds == 120 && !host.Reminder.IsVisible, "Reminder confirmation starts full steeping timer");
             host.ShowMenu();
             await Task.Delay(350);
             Check(menu.BrewStage.IsChecked == true && menu.ProgressRing.IsTiming && !menu.PrimaryButton.IsEnabled,
@@ -273,7 +273,7 @@ internal static class DesktopChecks
             CapturePanel(menu, Path.Combine(outputDirectory, "windows-steeping-panel.png"));
             host.HideMenu();
             await Task.Delay(220);
-            now = now.AddSeconds(180);
+            now = now.AddSeconds(120);
             foreground = ReadFocus();
             store.Tick();
             Check(ReadFocus() == foreground, "Reused reminder window still preserves operating-system input focus");
@@ -303,7 +303,7 @@ internal static class DesktopChecks
             await Task.Delay(350);
             Click(menu.SkipButton);
             await Task.Delay(250);
-            Check(store.Phase == TeaPhase.Brewing && store.DisplayedInfusion == 2 && store.RemainingSeconds == 210,
+            Check(store.Phase == TeaPhase.Brewing && store.DisplayedInfusion == 2 && store.RemainingSeconds == 150,
                 "Refill skip starts the full next infusion without adding leaves");
             store.EndRound();
             store.FirstBrewSeconds = 1800;

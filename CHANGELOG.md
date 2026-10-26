@@ -2,6 +2,10 @@
 
 This history describes Tea Panel (茶伴) app versions. The current source and latest release version are **0.4.2**.
 
+## Unreleased
+
+- Update the gardenia preset on macOS and Windows to 2 g of dry tea per 330 mL, a 2-minute cooling delay, and a 2-minute first steep; keep the 30-second infusion increment and preserve saved custom recipes and drafts.
+
 ## 0.4.2
 
 - Add a native Windows 11 x64 tray app built with C#, WPF, and .NET 10, alongside the existing macOS source tree.

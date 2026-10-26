@@ -41,7 +41,7 @@ public static class TeaPresets
 
     public static TeaConfiguration Get(TeaKind tea) => tea switch
     {
-        TeaKind.Gardenia => new("gardenia", Name(tea), TeaIcon.Leaf, tea, 80, new(180, 180, 30, 50)),
+        TeaKind.Gardenia => new("gardenia", Name(tea), TeaIcon.Leaf, tea, 80, new(120, 120, 30, 165)),
         TeaKind.Tieguanyin => new("tieguanyin", Name(tea), TeaIcon.Cup, tea, 100, new(0, 60, 30, 40)),
         _ => new("jasmine", Name(tea), TeaIcon.Flower, tea, 85, new(120, 180, 30, 50))
     };

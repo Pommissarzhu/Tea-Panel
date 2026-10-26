@@ -14,7 +14,8 @@ enum TeaCoreTests {
             checks += 1
         }
 
-        check(teaGrams(store.recommendedGrams) == "6.6", "Gardenia 4 g / 200 ml should give 6.6 g for 330 ml")
+        check(store.preferences.waterML == 330 && store.recommendedGrams == 2 && teaGrams(store.recommendedGrams) == "2.0",
+              "Gardenia should default to exactly 2 g of dry tea for 330 ml")
         check(TeaKind.gardenia.recommendedWaterTemperatureC == 80, "Gardenia green tea should reference 80 C")
         check(TeaKind.tieguanyin.recommendedWaterTemperatureC == 100, "Tieguanyin should reference 100 C")
         store.selectTea(.tieguanyin)
@@ -24,14 +25,14 @@ enum TeaCoreTests {
         check(teaGrams(store.recommendedGrams) == "6.6", "Jasmine 4 g / 200 ml should scale to 6.6 g")
         check(store.configuration.waterTemperatureC == 85 && store.recipe.coolingSeconds == 120,
               "Jasmine should reference 85 C and cool for two minutes")
-        store.setWaterML(200)
-        for (tea, grams, times) in [
-            (TeaKind.gardenia, 4.0, [180, 210, 240, 270]),
-            (TeaKind.jasmine, 4.0, [180, 210, 240, 270]),
-            (TeaKind.tieguanyin, 5.0, [60, 90, 120, 150])
+        for (tea, waterML, grams, times) in [
+            (TeaKind.gardenia, 330.0, 2.0, [120, 150, 180, 210]),
+            (TeaKind.jasmine, 200.0, 4.0, [180, 210, 240, 270]),
+            (TeaKind.tieguanyin, 200.0, 5.0, [60, 90, 120, 150])
         ] {
+            store.setWaterML(waterML)
             store.selectTea(tea)
-            check(store.recommendedGrams == grams, "Each confirmed recipe must give the specified dose for 200 ml")
+            check(store.recommendedGrams == grams, "Each confirmed recipe must give the specified dose for its water volume")
             check((1...4).map { store.recipe.brewSeconds(for: $0) } == times,
                   "The first four infusions must match the confirmed time table")
         }
@@ -54,11 +55,11 @@ enum TeaCoreTests {
 
         store.startNewRound()
         check(store.phase == .cooling && store.round?.startedInfusions == 0, "Cooling is not a consumed infusion")
-        check(store.remainingSeconds == 180, "Gardenia cooling should be 180 seconds")
+        check(store.remainingSeconds == 120, "Gardenia cooling should be two minutes")
         store.setWaterML(300)
         store.updateRecipe(for: .gardenia) { $0.waterPerGram = 100 }
         check(store.round?.waterML == 330 && store.round?.grams == 3, "Round water and grams must be frozen")
-        now = now.addingTimeInterval(181)
+        now = now.addingTimeInterval(120)
         store.tick()
         check(store.phase == .waitingForLeaves && store.reminder?.kind == .addLeaves, "Cooling should request confirmation")
         let reminderID = store.reminder?.id
@@ -66,24 +67,24 @@ enum TeaCoreTests {
         store.tick()
         check(store.phase == .waitingForLeaves && store.reminder?.id == reminderID, "A missed reminder must persist without auto-brewing")
         store.confirmLeaves()
-        check(store.phase == .brewing && store.remainingSeconds == 180, "Brew starts at actual confirmation time")
+        check(store.phase == .brewing && store.remainingSeconds == 120, "The two-minute brew starts at actual confirmation time")
         check(store.round?.startedInfusions == 1, "Only actual brewing counts")
-        now = now.addingTimeInterval(180)
+        now = now.addingTimeInterval(120)
         store.tick()
         check(store.phase == .ready && store.reminder?.kind == .teaReady, "Brew completion must remind")
 
         store.prepareRefill()
         check(store.phase == .preparingRefill && store.deadline == nil, "Refill waits until new water is ready")
         store.startRefill()
-        check(store.phase == .cooling && store.plannedBrewSeconds == 210, "Second gardenia brew adds 30 seconds")
+        check(store.phase == .cooling && store.plannedBrewSeconds == 150, "Second gardenia brew adds 30 seconds")
         check(store.round?.grams == 3 && store.round?.startedInfusions == 1, "Refill retains old leaves and does not count early")
-        now = now.addingTimeInterval(180)
+        now = now.addingTimeInterval(120)
         store.tick()
         check(store.reminder?.infusion == 2, "Refill reminder must refer to infusion 2")
         store.confirmLeaves()
-        check(store.round?.startedInfusions == 2 && store.remainingSeconds == 210, "Second brew uses incremented time")
+        check(store.round?.startedInfusions == 2 && store.remainingSeconds == 150, "Second brew uses incremented time")
         store.updateRecipe(for: .gardenia) { $0.firstBrewSeconds = 240 }
-        check(store.remainingSeconds == 210, "Editing time cannot modify the running timer")
+        check(store.remainingSeconds == 150, "Editing time cannot modify the running timer")
         store.endRound()
         check(store.phase == .idle && store.round == nil && store.reminder == nil, "Ending a round clears active work")
         store.startNewRound()
@@ -128,11 +129,11 @@ enum TeaCoreTests {
         check(reopened.configuration.recipe.waterPerGram == 110, "A new custom value must not be overwritten on every launch")
         check(reopened.customConfigurations.count == 1, "Reopening must not duplicate migrated profiles")
 
-        // Updating built-in recipes must preserve profiles and drafts saved by 0.3.2.
+        // Updating built-in recipes must preserve saved profiles, including the previous gardenia default.
         let previousProfiles = [
             TeaConfiguration(id: "previous-gardenia", name: "旧栀子", icon: .leaf, baseTea: .gardenia,
                              waterTemperatureC: 80,
-                             recipe: TeaRecipe(coolingSeconds: 180, firstBrewSeconds: 120, incrementSeconds: 30, waterPerGram: 100)),
+                             recipe: TeaRecipe(coolingSeconds: 180, firstBrewSeconds: 180, incrementSeconds: 30, waterPerGram: 50)),
             TeaConfiguration(id: "previous-tieguanyin", name: "旧铁观音", icon: .cup, baseTea: .tieguanyin,
                              waterTemperatureC: 95,
                              recipe: TeaRecipe(coolingSeconds: 0, firstBrewSeconds: 150, incrementSeconds: 30, waterPerGram: 100)),
@@ -143,10 +144,10 @@ enum TeaCoreTests {
         var previousPreferences = TeaPreferences()
         previousPreferences.cupCapacityML = 400
         previousPreferences.waterML = 300
-        previousPreferences.selectedTea = .jasmine
+        previousPreferences.selectedTea = .gardenia
         previousPreferences.templateRevision = 2
         previousPreferences.customConfigurations = previousProfiles
-        var previousDraft = previousProfiles[2]
+        var previousDraft = previousProfiles[0]
         previousDraft.name = "尚未保存的旧草稿"
         previousDraft.recipe.firstBrewSeconds = 135
         previousPreferences.customDraft = previousDraft
@@ -162,10 +163,11 @@ enum TeaCoreTests {
               "A template update must not reset shared cup or water settings")
         check(defaults.data(forKey: TeaStore.preferencesKey) == previousData,
               "Loading current preferences must not rewrite or migrate existing custom data")
-        updatedTemplates.selectTea(.jasmine)
+        updatedTemplates.selectTea(.gardenia)
         let updatedReload = TeaStore(defaults: defaults, now: { now })
-        check(!updatedReload.isCustomMode && updatedReload.configuration.waterTemperatureC == 85
-              && updatedReload.recipe.firstBrewSeconds == 180 && updatedReload.recipe.waterPerGram == 50,
+        check(!updatedReload.isCustomMode && updatedReload.configuration.waterTemperatureC == 80
+              && updatedReload.recipe.coolingSeconds == 120 && updatedReload.recipe.firstBrewSeconds == 120
+              && updatedReload.recipe.incrementSeconds == 30 && updatedReload.recipe.waterPerGram == 165,
               "Selecting a built-in template must use the new recipe after relaunch")
         check(updatedReload.customConfigurations == previousProfiles && updatedReload.preferences.customDraft == previousDraft,
               "Selecting the updated template must retain all saved profiles and the recent draft")
@@ -225,7 +227,7 @@ enum TeaCoreTests {
               "Loading a saved profile must not replace water, cup or infusion")
         custom.setStartingInfusion(1)
         custom.updateRecipe(for: .gardenia) { $0.firstBrewSeconds = 90 }
-        check(custom.hasUnsavedChanges && custom.savedConfiguration?.recipe.firstBrewSeconds == 180, "Editing a saved profile must not overwrite it until save")
+        check(custom.hasUnsavedChanges && custom.savedConfiguration?.recipe.firstBrewSeconds == 120, "Editing a saved profile must not overwrite it until save")
         check(custom.saveConfiguration() && custom.configuration.id == firstID && custom.customConfigurations.count == 1, "Update must reuse a save slot")
         custom.setConfigurationName("下午茶")
         check(custom.saveConfiguration(asNew: true), "Save-as should create another profile")
@@ -328,9 +330,9 @@ enum TeaCoreTests {
         let originalRecipe = skipping.recipe
         check(skipping.canSkipCooling, "Flower tea must offer a direct brewing action before starting")
         skipping.skipCooling()
-        check(skipping.phase == .brewing && skipping.remainingSeconds == 180 && skipping.displayedInfusion == 1,
+        check(skipping.phase == .brewing && skipping.remainingSeconds == 120 && skipping.displayedInfusion == 1,
               "Direct start must skip cooling and leaf confirmation for the first infusion")
-        check(skipping.round?.startedInfusions == 1 && skipping.reminder == nil && skipping.statusText == "泡 03:00",
+        check(skipping.round?.startedInfusions == 1 && skipping.reminder == nil && skipping.statusText == "泡 02:00",
               "Direct start must count one infusion and show the brewing timer")
         check(skipping.recipe == originalRecipe && !skipping.isCustomMode,
               "Skipping this pour must not edit a built-in recipe or enter custom mode")
@@ -339,7 +341,7 @@ enum TeaCoreTests {
         skipping.skipCooling()
         check(skipping.deadline == directDeadline && skipping.round?.startedInfusions == 1 && !skipping.canSkipCooling,
               "Repeated direct-start actions must not reset or double count an active brew")
-        now = now.addingTimeInterval(160)
+        now = now.addingTimeInterval(100)
         skipping.tick()
         check(skipping.phase == .ready && skipping.reminder?.kind == .teaReady && skipping.reminder?.infusion == 1,
               "A skipped cooling stage must lead directly to the correct tea-ready reminder")
@@ -351,7 +353,7 @@ enum TeaCoreTests {
         skipping.prepareRefill()
         check(skipping.canSkipCooling && skipping.displayedInfusion == 2, "Preparing a refill must offer skipping for the next infusion")
         skipping.skipCooling()
-        check(skipping.phase == .brewing && skipping.remainingSeconds == 210 && skipping.displayedInfusion == 2,
+        check(skipping.phase == .brewing && skipping.remainingSeconds == 150 && skipping.displayedInfusion == 2,
               "A direct refill must use the second infusion's increased time")
         check(skipping.round?.grams == originalGrams && skipping.round?.startedInfusions == 2 && skipping.reminder == nil,
               "Direct refill must keep the existing leaves and clear the previous reminder")
@@ -373,19 +375,19 @@ enum TeaCoreTests {
         skipping.updateRecipe(for: .gardenia) { $0.firstBrewSeconds = 240 }
         let editedConfiguration = skipping.configuration
         skipping.skipCooling()
-        check(skipping.phase == .brewing && skipping.remainingSeconds == 210 && skipping.phaseDuration == 210,
+        check(skipping.phase == .brewing && skipping.remainingSeconds == 150 && skipping.phaseDuration == 150,
               "Skipping mid-cooling must use the planned full brew time, not subtract cooling or apply later edits")
         check(skipping.displayedInfusion == 2 && skipping.round?.startedInfusions == 2 && skipping.reminder == nil,
               "Skipping mid-cooling must preserve infusion numbering and dismiss an open preview")
-        check(skipping.configuration == editedConfiguration && skipping.recipe.coolingSeconds == 180,
+        check(skipping.configuration == editedConfiguration && skipping.recipe.coolingSeconds == 120,
               "Skipping must not change custom parameters or disable cooling on future pours")
-        now = now.addingTimeInterval(210)
+        now = now.addingTimeInterval(150)
         skipping.tick()
         check(skipping.phase == .ready && skipping.reminder?.infusion == 2 && skipping.reminder?.kind == .teaReady,
               "Mid-cooling skip must retain the correct final reminder")
         skipping.prepareRefill()
         skipping.startRefill()
-        check(skipping.phase == .cooling && skipping.remainingSeconds == 180 && skipping.displayedInfusion == 3,
+        check(skipping.phase == .cooling && skipping.remainingSeconds == 120 && skipping.displayedInfusion == 3,
               "The next normal pour must still cool according to its recipe")
         skipping.endRound()
         skipping.setWaterML(500)

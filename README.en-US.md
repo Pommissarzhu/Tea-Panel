@@ -19,6 +19,7 @@ On macOS, the app is named **茶伴** on Simplified Chinese systems and **Tea Pa
 <p align="center">
   <img src="docs/images/brewing-panel.png" width="384" alt="macOS Tea Panel showing gardenia green tea, 330 mL, and 6.6 g of dry tea">
   <img src="docs/images/windows-brewing-panel.png" width="384" alt="Native Windows WPF panel showing gardenia green tea, 330 mL, and 6.6 g of dry tea">
+  <br><sub>Screenshots show the earlier gardenia recipe. See Built-in presets below for the current recipe.</sub>
 </p>
 
 ## Features
@@ -89,13 +90,13 @@ Use **预览提醒** to see a reminder without starting or changing a timer. See
 
 These presets are starting points for brewing in a cup. Adjust them for your tea and taste.
 
-| Tea | Reference water temperature | Dry tea per 200 mL | Cooling delay | First steep | Added per infusion |
+| Tea | Reference water temperature | Dry tea / water | Cooling delay | First steep | Added per infusion |
 | --- | --- | --- | --- | --- | --- |
-| Gardenia green tea | 80°C | 4 g | 3 min | 3 min | 30 sec |
-| Tieguanyin oolong | 100°C | 5 g | Skip | 1 min | 30 sec |
-| Jasmine green tea | 85°C | 4 g | 2 min | 3 min | 30 sec |
+| Gardenia green tea | 80°C | 2 g / 330 mL | 2 min | 2 min | 30 sec |
+| Tieguanyin oolong | 100°C | 5 g / 200 mL | Skip | 1 min | 30 sec |
+| Jasmine green tea | 85°C | 4 g / 200 mL | 2 min | 3 min | 30 sec |
 
-At 330 mL, the suggested amounts are **6.6 g**, **8.3 g**, and **6.6 g**, respectively. Amounts are rounded to one decimal place.
+At 330 mL, the suggested amounts are **2.0 g**, **8.3 g**, and **6.6 g**, respectively. The gardenia water-to-dry-tea ratio is **165 : 1**. Amounts are rounded to one decimal place.
 
 Cooling is a fixed timer, not a temperature measurement. The temperature setting is a reference, and a timer cannot stop the leaves from steeping: remove them when the reminder appears.
 

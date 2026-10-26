@@ -16,7 +16,7 @@ The app approximates 1 mL of water as 1 g and calculates:
 dry tea (g) = poured water (mL) / water-to-dry-tea ratio
 ```
 
-The ratio field uses **water : dry tea**. A value of `50 : 1` gives 6.6 g for 330 mL; `40 : 1` gives 8.25 g, displayed as 8.3 g. Gardenia and jasmine presets use 50 : 1, and Tieguanyin uses 40 : 1. For gardenia tea, weigh the whole dry mixture, including the flowers and green tea.
+The ratio field uses **water : dry tea**. The gardenia preset uses `165 : 1`, giving 2.0 g for 330 mL. Jasmine uses `50 : 1`, giving 6.6 g for 330 mL; Tieguanyin uses `40 : 1`, giving 8.25 g, displayed as 8.3 g. For gardenia tea, weigh the whole dry mixture, including the flowers and green tea.
 
 Changing cup capacity, water volume, or the starting infusion keeps your current recipe selected. At the start of a session, the app records its water volume, dry tea amount, recipe name, and icon. Water changes made during that session apply to the next session with fresh leaves.
 
@@ -29,6 +29,8 @@ For gardenia or jasmine tea:
 3. When steeping ends, remove the infuser or pour out the tea and acknowledge the reminder.
 
 Steeping begins when you confirm that you added the leaves. Time spent waiting for that confirmation does not count toward steeping.
+
+Gardenia cools for 2 minutes and steeps for 2 minutes on the first infusion. Jasmine cools for 2 minutes and steeps for 3 minutes on the first infusion.
 
 Tieguanyin has no cooling delay by default. Prepare the leaves and water, then choose **已注水，开始泡茶**.
 
@@ -50,7 +52,7 @@ All three built-in presets add 30 seconds per infusion:
 
 | Tea | Infusion 1 | Infusion 2 | Infusion 3 | Infusion 4 |
 | --- | --- | --- | --- | --- |
-| Gardenia green tea | 3:00 | 3:30 | 4:00 | 4:30 |
+| Gardenia green tea | 2:00 | 2:30 | 3:00 | 3:30 |
 | Tieguanyin oolong | 1:00 | 1:30 | 2:00 | 2:30 |
 | Jasmine green tea | 3:00 | 3:30 | 4:00 | 4:30 |
 

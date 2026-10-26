@@ -35,10 +35,10 @@ enum TeaKind: String, CaseIterable, Codable, Identifiable {
     }
     var temperature: String { "参考水温约 \(recommendedWaterTemperatureC)°C" }
     var defaultRecipe: TeaRecipe {
-        // User-confirmed cup recipes (2026-10-19); each refill adds 30 seconds.
+        // User-confirmed cup recipes; gardenia updated 2026-10-26. Each refill adds 30 seconds.
         switch self {
         case .gardenia:
-            return TeaRecipe(coolingSeconds: 180, firstBrewSeconds: 180, incrementSeconds: 30, waterPerGram: 50)
+            return TeaRecipe(coolingSeconds: 120, firstBrewSeconds: 120, incrementSeconds: 30, waterPerGram: 165)
         case .tieguanyin:
             return TeaRecipe(coolingSeconds: 0, firstBrewSeconds: 60, incrementSeconds: 30, waterPerGram: 40)
         case .jasmine:

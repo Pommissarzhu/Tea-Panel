@@ -12,7 +12,7 @@ TeaStore Fresh(TeaPreferences? preferences = null) => new(preferences, () => now
 var store = Fresh();
 foreach (var (tea, temperature, cooling, first, grams330, grams200) in new[]
 {
-    (TeaKind.Gardenia, 80, 180, 180, "6.6", "4.0"),
+    (TeaKind.Gardenia, 80, 120, 120, "2.0", "1.2"),
     (TeaKind.Tieguanyin, 100, 0, 60, "8.3", "5.0"),
     (TeaKind.Jasmine, 85, 120, 180, "6.6", "4.0")
 })
@@ -36,7 +36,7 @@ store.StartNewRound();
 Check(store.Phase == TeaPhase.Idle && store.ValidationMessage is not null, "Over-capacity water blocks start");
 store.WaterML = 330;
 store.StartNewRound();
-Check(store.Phase == TeaPhase.Cooling && store.Round?.StartedInfusions == 0 && store.RemainingSeconds == 180, "Cooling does not consume an infusion");
+Check(store.Phase == TeaPhase.Cooling && store.Round?.StartedInfusions == 0 && store.RemainingSeconds == 120, "Cooling does not consume an infusion");
 store.StartNewRound();
 Check(store.Round?.StartedInfusions == 0, "A repeated start cannot replace the round");
 store.WaterML = 300;
@@ -44,7 +44,7 @@ store.WaterPerGram = 100;
 store.ConfigurationName = "下一轮的茶";
 store.SetIcon(TeaIcon.Moon);
 Check(store.Round?.WaterML == 330 && store.Round.Grams == 3 && store.DisplayIcon == TeaIcon.Leaf, "Round retains dose, water and icon");
-now = now.AddSeconds(181);
+now = now.AddSeconds(120);
 store.Tick();
 Check(store.Phase == TeaPhase.WaitingForLeaves && store.Reminder?.Kind == ReminderKind.AddLeaves, "Cooling asks for leaves");
 var reminderId = store.Reminder!.Id;
@@ -56,10 +56,10 @@ Check(store.Reminder?.Configuration.Name != "下一轮的茶" && store.Reminder?
 store.ConfirmLeaves();
 var deadline = store.Deadline;
 store.ConfirmLeaves();
-Check(store.Phase == TeaPhase.Brewing && store.RemainingSeconds == 180 && store.Round?.StartedInfusions == 1 && store.Deadline == deadline, "Only actual confirmation starts one full brew");
+Check(store.Phase == TeaPhase.Brewing && store.RemainingSeconds == 120 && store.Round?.StartedInfusions == 1 && store.Deadline == deadline, "Only actual confirmation starts one full brew");
 store.FirstBrewSeconds = 240;
-Check(store.RemainingSeconds == 180, "Editing duration does not alter current timer");
-now = now.AddSeconds(180);
+Check(store.RemainingSeconds == 120, "Editing duration does not alter current timer");
+now = now.AddSeconds(120);
 store.Tick();
 Check(store.Phase == TeaPhase.Ready && store.Reminder?.Kind == ReminderKind.TeaReady, "Brew completion reminds");
 store.SkipCooling();
@@ -70,7 +70,7 @@ store.PrepareRefill();
 Check(store.Phase == TeaPhase.PreparingRefill && store.Deadline is null, "Refill waits for fresh water");
 store.StartRefill();
 Check(store.Phase == TeaPhase.Cooling && store.PlannedBrewSeconds == 270 && store.Round?.Grams == 3, "Next infusion applies time edits and keeps leaves");
-now = now.AddSeconds(180);
+now = now.AddSeconds(120);
 store.Tick();
 Check(store.Reminder?.Infusion == 2 && store.Reminder.Grams == 3, "Refill reminder has correct infusion/dose");
 store.ConfirmLeaves();
@@ -83,7 +83,7 @@ Check(store.Round?.WaterML == 300 && store.Round.Grams == 3 && store.DisplayName
 var skipping = Fresh();
 skipping.SetStartingInfusion(3);
 skipping.SkipCooling();
-Check(skipping.Phase == TeaPhase.Brewing && skipping.RemainingSeconds == 240 && skipping.DisplayedInfusion == 3, "Direct start honors chosen infusion");
+Check(skipping.Phase == TeaPhase.Brewing && skipping.RemainingSeconds == 180 && skipping.DisplayedInfusion == 3, "Direct start honors chosen infusion");
 deadline = skipping.Deadline;
 skipping.SkipCooling();
 Check(skipping.Deadline == deadline && skipping.Round?.StartedInfusions == 3, "Repeated skip cannot restart brewing");
@@ -95,9 +95,9 @@ skipping.Tick();
 skipping.FirstBrewSeconds = 240;
 skipping.PreviewReminder();
 skipping.SkipCooling();
-Check(skipping.Phase == TeaPhase.Brewing && skipping.RemainingSeconds == 210 && skipping.DisplayedInfusion == 2, "Mid-cooling skip preserves the originally planned full duration");
-Check(skipping.Reminder is null && skipping.CoolingSeconds == 180, "Skipping clears preview without changing future cooling");
-now = now.AddSeconds(210);
+Check(skipping.Phase == TeaPhase.Brewing && skipping.RemainingSeconds == 150 && skipping.DisplayedInfusion == 2, "Mid-cooling skip preserves the originally planned full duration");
+Check(skipping.Reminder is null && skipping.CoolingSeconds == 120, "Skipping clears preview without changing future cooling");
+now = now.AddSeconds(150);
 skipping.Tick();
 skipping.PrepareRefill();
 skipping.SkipCooling();
